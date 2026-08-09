@@ -115,6 +115,20 @@
       font-size: 20px;
       font-weight: 700;
       color: #1c1c1e;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chat-header .back-btn {
+      background: none;
+      border: none;
+      color: #007aff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 12px;
+      margin-left: -8px;
     }
     .chat-header .logout-btn {
       background: none;
@@ -125,9 +139,103 @@
       cursor: pointer;
       padding: 6px 12px;
     }
-    .chat-header .logout-btn:active { opacity: 0.6; }
+    .chat-header .logout-btn:active,
+    .chat-header .back-btn:active { opacity: 0.6; }
 
-    /* Область сообщений */
+    /* --- Список чатов (стартовый экран) --- */
+    #start-screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      background: white;
+    }
+    #start-screen.active { display: flex; }
+
+    .search-area {
+      padding: 12px 16px;
+      background: white;
+      border-bottom: 1px solid #e5e5ea;
+    }
+    .search-area input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 24px;
+      border: 1px solid #d1d1d6;
+      font-size: 16px;
+      background: #f2f2f7;
+      outline: none;
+      transition: 0.2s;
+    }
+    .search-area input:focus {
+      border-color: #007aff;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
+    }
+
+    .search-results {
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 8px 16px;
+      background: white;
+      border-bottom: 1px solid #e5e5ea;
+      display: none;
+    }
+    .search-results.active { display: block; }
+    .search-result-item {
+      padding: 12px 8px;
+      cursor: pointer;
+      border-bottom: 1px solid #f2f2f7;
+      transition: 0.15s;
+    }
+    .search-result-item:active { background: #f2f2f7; }
+    .search-result-item .name { font-weight: 600; }
+    .search-result-item .email { font-size: 14px; color: #8e8e93; }
+
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    .chat-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid #f2f2f7;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .chat-list-item:active { background: #f2f2f7; }
+    .chat-list-item .info { flex: 1; overflow: hidden; }
+    .chat-list-item .name { font-weight: 600; color: #1c1c1e; }
+    .chat-list-item .last-msg {
+      font-size: 14px;
+      color: #8e8e93;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .chat-list-item .time {
+      font-size: 12px;
+      color: #8e8e93;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+    .chat-list-empty {
+      text-align: center;
+      color: #8e8e93;
+      padding: 40px 20px;
+    }
+
+    /* --- Область сообщений (экран чата) --- */
+    #chat-screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      background: #f2f2f7;
+    }
+    #chat-screen.active { display: flex; }
+
     .messages-area {
       flex: 1;
       overflow-y: auto;
@@ -135,7 +243,6 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      background: #f2f2f7;
     }
     .messages-area::-webkit-scrollbar {
       width: 4px;
@@ -145,7 +252,7 @@
       border-radius: 10px;
     }
 
-    /* Сообщение */
+    /* --- Сообщения --- */
     .message {
       max-width: 80%;
       padding: 10px 14px;
@@ -201,7 +308,7 @@
     }
     .message-sent .timestamp { color: rgba(255,255,255,0.6); }
 
-    /* Панель ввода */
+    /* --- Панель ввода --- */
     .input-area {
       background: white;
       border-top: 1px solid #e5e5ea;
@@ -258,7 +365,7 @@
     }
     .input-area .send-btn:active { transform: scale(0.94); }
 
-    /* Кнопка прокрутки вниз */
+    /* --- Кнопка прокрутки --- */
     .scroll-down-btn {
       position: absolute;
       bottom: 90px;
@@ -280,7 +387,7 @@
     }
     .scroll-down-btn:active { transform: scale(0.92); }
 
-    /* Попап для гифок */
+    /* --- Попап для гифок --- */
     .gif-popup {
       display: none;
       position: absolute;
@@ -365,7 +472,7 @@
       width: 100%;
     }
 
-    /* Адаптив */
+    /* --- Адаптив --- */
     @media (max-width: 480px) {
       #app { max-height: 100vh; border-radius: 0; }
     }
@@ -385,26 +492,46 @@
     <div id="login-status"></div>
   </div>
 
-  <!-- ===== СТРАНИЦА ЧАТА ===== -->
+  <!-- ===== ОСНОВНОЙ ИНТЕРФЕЙС ЧАТА ===== -->
   <div id="chat-page">
-    <!-- Шапка -->
-    <div class="chat-header">
-      <span class="title">💬 Общий чат</span>
-      <button class="logout-btn" id="btn-logout">Выйти</button>
+
+    <!-- Стартовый экран (список чатов + поиск) -->
+    <div id="start-screen">
+      <div class="chat-header">
+        <span class="title">💬 Чаты</span>
+        <button class="logout-btn" id="btn-logout">Выйти</button>
+      </div>
+
+      <div class="search-area">
+        <input type="text" id="search-users" placeholder="Поиск пользователей по email...">
+      </div>
+
+      <div class="search-results" id="search-results"></div>
+
+      <div class="chat-list" id="chat-list">
+        <div class="chat-list-empty">У вас пока нет чатов.<br>Начните поиск, чтобы найти собеседника</div>
+      </div>
     </div>
 
-    <!-- Область сообщений -->
-    <div class="messages-area" id="messages-area"></div>
+    <!-- Экран чата -->
+    <div id="chat-screen">
+      <div class="chat-header">
+        <button class="back-btn" id="chat-back-btn">← Назад</button>
+        <span class="title" id="chat-title">Чат</span>
+        <span style="width: 60px;"></span>
+      </div>
 
-    <!-- Кнопка прокрутки вниз -->
-    <button class="scroll-down-btn" id="scroll-down-btn">↓</button>
+      <div class="messages-area" id="messages-area"></div>
 
-    <!-- Панель ввода -->
-    <div class="input-area">
-      <button class="gif-btn" id="gif-btn">🎬</button>
-      <textarea id="message-input" placeholder="Сообщение..." rows="1"></textarea>
-      <button class="send-btn" id="send-btn">Отправить</button>
+      <button class="scroll-down-btn" id="scroll-down-btn">↓</button>
+
+      <div class="input-area">
+        <button class="gif-btn" id="gif-btn">🎬</button>
+        <textarea id="message-input" placeholder="Сообщение..." rows="1"></textarea>
+        <button class="send-btn" id="send-btn">Отправить</button>
+      </div>
     </div>
+
   </div>
 
   <!-- ===== ПОПАП ДЛЯ ГИФОК ===== -->
@@ -428,7 +555,7 @@
 <!-- ========================================================== -->
 <script>
   // ------------------------------------------------------------
-  // 1. КОНФИГ FIREBASE (твой)
+  // 1. КОНФИГ FIREBASE
   // ------------------------------------------------------------
   const firebaseConfig = {
     apiKey: "AIzaSyAXlZnWxnf0hNyGP8Xdx7t8YYHIFXwMZ5Q",
@@ -442,15 +569,27 @@
   const db = firebase.firestore();
 
   // ------------------------------------------------------------
-  // 2. ДОМ-ЭЛЕМЕНТЫ
+  // 2. КОНСТАНТЫ И DOM-ЭЛЕМЕНТЫ
   // ------------------------------------------------------------
+  const GIPHY_API_KEY = 'HnlRtWo9NXAw0vw8a9ZsqrDLuTAAHPfW';
+
+  // Страницы
   const loginPage = document.getElementById('login-page');
   const chatPage = document.getElementById('chat-page');
-  const statusEl = document.getElementById('login-status');
+  const startScreen = document.getElementById('start-screen');
+  const chatScreen = document.getElementById('chat-screen');
+
+  // Стартовый экран
+  const chatList = document.getElementById('chat-list');
+  const searchInput = document.getElementById('search-users');
+  const searchResults = document.getElementById('search-results');
+
+  // Экран чата
   const messagesArea = document.getElementById('messages-area');
   const messageInput = document.getElementById('message-input');
   const sendBtn = document.getElementById('send-btn');
-  const logoutBtn = document.getElementById('btn-logout');
+  const chatTitle = document.getElementById('chat-title');
+  const chatBackBtn = document.getElementById('chat-back-btn');
   const scrollDownBtn = document.getElementById('scroll-down-btn');
 
   // Гифки
@@ -459,10 +598,21 @@
   const gifClose = document.getElementById('gif-popup-close');
   const gifSearch = document.getElementById('gif-search-input');
   const gifGrid = document.getElementById('gif-grid');
-  const GIPHY_API_KEY = 'HnlRtWo9NXAw0vw8a9ZsqrDLuTAAHPfW';
+
+  // Статус
+  const statusEl = document.getElementById('login-status');
 
   // ------------------------------------------------------------
-  // 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+  // 3. СОСТОЯНИЕ
+  // ------------------------------------------------------------
+  let currentChatId = null;
+  let currentChatUser = null; // { uid, name }
+  let chatsListener = null;
+  let messagesListener = null;
+  let searchTimeout = null;
+
+  // ------------------------------------------------------------
+  // 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
   // ------------------------------------------------------------
   function getInitials(name) {
     if (!name) return '?';
@@ -477,8 +627,18 @@
     return `hsl(${Math.abs(hash) % 360}, 70%, 60%)`;
   }
 
+  function formatTime(timestamp) {
+    if (!timestamp) return '';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleTimeString();
+  }
+
+  function scrollToBottom() {
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+  }
+
   // ------------------------------------------------------------
-  // 4. ОТОБРАЖЕНИЕ СООБЩЕНИЙ
+  // 5. ОТОБРАЖЕНИЕ СООБЩЕНИЙ
   // ------------------------------------------------------------
   function addMessageToUI(data) {
     const currentUser = auth.currentUser;
@@ -490,13 +650,11 @@
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${isMine ? 'message-sent' : 'message-received'}`;
 
-    // Имя отправителя
     const senderSpan = document.createElement('span');
     senderSpan.className = 'sender';
     senderSpan.textContent = senderName;
     msgDiv.appendChild(senderSpan);
 
-    // Текст или гифка
     if (data.text) {
       const textP = document.createElement('div');
       textP.className = 'text';
@@ -510,38 +668,55 @@
       msgDiv.appendChild(img);
     }
 
-    // Время
     const timeSpan = document.createElement('div');
     timeSpan.className = 'timestamp';
-    timeSpan.textContent = new Date(data.timestamp?.toMillis?.() || Date.now()).toLocaleTimeString();
+    timeSpan.textContent = formatTime(data.timestamp);
     msgDiv.appendChild(timeSpan);
 
     messagesArea.appendChild(msgDiv);
     scrollToBottom();
   }
 
-  function scrollToBottom() {
-    messagesArea.scrollTop = messagesArea.scrollHeight;
+  // ------------------------------------------------------------
+  // 6. РАБОТА С ЧАТАМИ
+  // ------------------------------------------------------------
+
+  // Получить или создать чат с пользователем
+  async function getOrCreateChat(otherUserId) {
+    const currentUserId = auth.currentUser.uid;
+    const chatId = [currentUserId, otherUserId].sort().join('_');
+
+    const chatRef = db.collection('chats').doc(chatId);
+    const chatDoc = await chatRef.get();
+
+    if (!chatDoc.exists) {
+      await chatRef.set({
+        participants: [currentUserId, otherUserId],
+        lastMessage: '',
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    return chatRef;
   }
 
-  // Показывать кнопку прокрутки, если не внизу
-  messagesArea.addEventListener('scroll', () => {
-    const threshold = 100;
-    const atBottom = messagesArea.scrollHeight - messagesArea.scrollTop - messagesArea.clientHeight < threshold;
-    scrollDownBtn.style.display = atBottom ? 'none' : 'flex';
-  });
-  scrollDownBtn.addEventListener('click', scrollToBottom);
+  // Открыть чат
+  function openChat(chatId, otherUser) {
+    currentChatId = chatId;
+    currentChatUser = otherUser;
+    chatTitle.textContent = otherUser.name || otherUser.email || 'Чат';
 
-  // ------------------------------------------------------------
-  // 5. ПОДПИСКА НА НОВЫЕ СООБЩЕНИЯ
-  // ------------------------------------------------------------
-  let unsubscribe = null;
+    // Показываем экран чата
+    startScreen.classList.remove('active');
+    chatScreen.classList.add('active');
 
-  function listenMessages() {
-    if (unsubscribe) unsubscribe();
+    // Очищаем сообщения
     messagesArea.innerHTML = '';
 
-    unsubscribe = db.collection('messages')
+    // Слушаем сообщения
+    if (messagesListener) messagesListener();
+    messagesListener = db.collection('chats')
+      .doc(chatId)
+      .collection('messages')
       .orderBy('timestamp', 'asc')
       .onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
@@ -550,25 +725,48 @@
           }
         });
       }, (error) => {
-        console.error('Ошибка подписки:', error);
+        console.error('Ошибка подписки на сообщения:', error);
       });
+
+    scrollToBottom();
+  }
+
+  // Вернуться в список чатов
+  function closeChat() {
+    if (messagesListener) {
+      messagesListener();
+      messagesListener = null;
+    }
+    currentChatId = null;
+    currentChatUser = null;
+    chatScreen.classList.remove('active');
+    startScreen.classList.add('active');
+    messagesArea.innerHTML = '';
   }
 
   // ------------------------------------------------------------
-  // 6. ОТПРАВКА СООБЩЕНИЙ
+  // 7. ОТПРАВКА СООБЩЕНИЙ
   // ------------------------------------------------------------
   async function sendMessage(text) {
     const user = auth.currentUser;
     if (!user) { alert('Вы не авторизованы!'); return; }
     if (!text || !text.trim()) return;
+    if (!currentChatId) { alert('Чат не выбран!'); return; }
 
     try {
-      await db.collection('messages').add({
+      await db.collection('chats').doc(currentChatId).collection('messages').add({
         text: text.trim(),
         senderId: user.uid,
         senderName: user.displayName || user.email || 'Аноним',
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
+
+      // Обновляем последнее сообщение в чате
+      await db.collection('chats').doc(currentChatId).update({
+        lastMessage: text.trim(),
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
       messageInput.value = '';
       messageInput.style.height = 'auto';
     } catch (e) {
@@ -576,17 +774,24 @@
     }
   }
 
-  // Отправка гифки
   async function sendGifMessage(gifUrl) {
     const user = auth.currentUser;
     if (!user) { alert('Вы не авторизованы!'); return; }
+    if (!currentChatId) { alert('Чат не выбран!'); return; }
+
     try {
-      await db.collection('messages').add({
+      await db.collection('chats').doc(currentChatId).collection('messages').add({
         gifUrl: gifUrl,
         senderId: user.uid,
         senderName: user.displayName || user.email || 'Аноним',
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
+
+      await db.collection('chats').doc(currentChatId).update({
+        lastMessage: '🖼️ GIF',
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
       closeGifPopup();
     } catch (e) {
       alert('Ошибка отправки гифки: ' + e.message);
@@ -594,10 +799,141 @@
   }
 
   // ------------------------------------------------------------
-  // 7. ГИФКИ (GIPHY)
+  // 8. СПИСОК ЧАТОВ
   // ------------------------------------------------------------
-  let searchTimeout;
+  function renderChatList() {
+    const currentUserId = auth.currentUser.uid;
+    if (chatsListener) chatsListener();
 
+    chatList.innerHTML = '<div class="chat-list-empty">Загрузка...</div>';
+
+    chatsListener = db.collection('chats')
+      .where('participants', 'array-contains', currentUserId)
+      .orderBy('lastUpdated', 'desc')
+      .onSnapshot(async (snapshot) => {
+        if (snapshot.empty) {
+          chatList.innerHTML = '<div class="chat-list-empty">У вас пока нет чатов.<br>Начните поиск, чтобы найти собеседника</div>';
+          return;
+        }
+
+        // Собираем данные о чатах
+        const chatItems = [];
+        const userCache = {};
+
+        for (const doc of snapshot.docs) {
+          const data = doc.data();
+          const otherUserId = data.participants.find(id => id !== currentUserId);
+
+          if (!otherUserId) continue;
+
+          // Получаем данные другого пользователя
+          if (!userCache[otherUserId]) {
+            const userDoc = await db.collection('users').doc(otherUserId).get();
+            userCache[otherUserId] = userDoc.exists ? userDoc.data() : { name: 'Неизвестный', email: '' };
+          }
+
+          const user = userCache[otherUserId];
+          chatItems.push({
+            chatId: doc.id,
+            user: {
+              uid: otherUserId,
+              name: user.name || user.email || 'Неизвестный'
+            },
+            lastMessage: data.lastMessage || 'Нет сообщений',
+            lastUpdated: data.lastUpdated
+          });
+        }
+
+        // Рендерим список
+        chatList.innerHTML = '';
+        chatItems.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'chat-list-item';
+          const initials = getInitials(item.user.name);
+          const bgColor = stringToColor(item.user.uid);
+          div.innerHTML = `
+            <div class="info">
+              <div class="name" style="display:flex;align-items:center;gap:10px;">
+                <span style="display:inline-flex;width:36px;height:36px;border-radius:50%;background:${bgColor};color:white;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">${initials}</span>
+                ${item.user.name}
+              </div>
+              <div class="last-msg">${item.lastMessage}</div>
+            </div>
+            <div class="time">${item.lastUpdated ? formatTime(item.lastUpdated) : ''}</div>
+          `;
+          div.addEventListener('click', () => {
+            openChat(item.chatId, item.user);
+          });
+          chatList.appendChild(div);
+        });
+      }, (error) => {
+        console.error('Ошибка загрузки чатов:', error);
+        chatList.innerHTML = '<div class="chat-list-empty">Ошибка загрузки чатов</div>';
+      });
+  }
+
+  // ------------------------------------------------------------
+  // 9. ПОИСК ПОЛЬЗОВАТЕЛЕЙ
+  // ------------------------------------------------------------
+  async function searchUsers(query) {
+    if (!query || query.length < 2) {
+      searchResults.classList.remove('active');
+      return;
+    }
+
+    try {
+      const snapshot = await db.collection('users')
+        .where('email', '>=', query)
+        .where('email', '<=', query + '\uf8ff')
+        .limit(10)
+        .get();
+
+      searchResults.innerHTML = '';
+      let found = false;
+
+      snapshot.forEach(doc => {
+        if (doc.id === auth.currentUser.uid) return;
+        found = true;
+        const data = doc.data();
+        const div = document.createElement('div');
+        div.className = 'search-result-item';
+        div.innerHTML = `
+          <div class="name">${data.name || data.email}</div>
+          <div class="email">${data.email}</div>
+        `;
+        div.addEventListener('click', async () => {
+          // Создаём или открываем чат с этим пользователем
+          const chatRef = await getOrCreateChat(doc.id);
+          const chatDoc = await chatRef.get();
+          const userData = chatDoc.data();
+          const otherUserId = userData.participants.find(id => id !== auth.currentUser.uid);
+          const otherUserDoc = await db.collection('users').doc(otherUserId).get();
+          const otherUserData = otherUserDoc.data();
+          openChat(chatRef.id, {
+            uid: otherUserId,
+            name: otherUserData.name || otherUserData.email || 'Неизвестный'
+          });
+          searchResults.classList.remove('active');
+          searchInput.value = '';
+        });
+        searchResults.appendChild(div);
+      });
+
+      if (!found) {
+        searchResults.innerHTML = '<div style="padding:12px;color:#8e8e93;">Пользователь не найден</div>';
+      }
+      searchResults.classList.add('active');
+
+    } catch (e) {
+      console.error('Ошибка поиска:', e);
+      searchResults.innerHTML = '<div style="padding:12px;color:red;">Ошибка поиска</div>';
+      searchResults.classList.add('active');
+    }
+  }
+
+  // ------------------------------------------------------------
+  // 10. ГИФКИ (GIPHY)
+  // ------------------------------------------------------------
   function openGifPopup() {
     gifPopup.classList.add('active');
     gifSearch.value = '';
@@ -608,22 +944,6 @@
   function closeGifPopup() {
     gifPopup.classList.remove('active');
   }
-
-  gifBtn.addEventListener('click', openGifPopup);
-  gifClose.addEventListener('click', closeGifPopup);
-  gifPopup.addEventListener('click', (e) => {
-    if (e.target === gifPopup) closeGifPopup();
-  });
-
-  gifSearch.addEventListener('input', () => {
-    clearTimeout(searchTimeout);
-    const query = gifSearch.value.trim();
-    if (query.length < 2) {
-      gifGrid.innerHTML = '<div class="placeholder">Введите запрос</div>';
-      return;
-    }
-    searchTimeout = setTimeout(() => searchGifs(query), 400);
-  });
 
   async function searchGifs(query) {
     try {
@@ -655,12 +975,48 @@
   }
 
   // ------------------------------------------------------------
-  // 8. ОБРАБОТЧИКИ СОБЫТИЙ
+  // 11. ОБРАБОТЧИКИ СОБЫТИЙ
   // ------------------------------------------------------------
-  // Отправка по кнопке
-  sendBtn.addEventListener('click', () => sendMessage(messageInput.value));
 
-  // Отправка по Enter
+  // Вход
+  document.getElementById('btn-login').addEventListener('click', () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => { statusEl.textContent = '✅ Вход выполнен'; statusEl.style.color = '#34c759'; })
+      .catch(e => { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#ff3b30'; });
+  });
+
+  // Регистрация
+  document.getElementById('btn-register').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      // Создаём профиль пользователя
+      await db.collection('users').doc(cred.user.uid).set({
+        name: email.split('@')[0] || 'Пользователь',
+        email: email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      statusEl.textContent = '✅ Аккаунт создан';
+      statusEl.style.color = '#34c759';
+    } catch (e) {
+      statusEl.textContent = '❌ ' + e.message;
+      statusEl.style.color = '#ff3b30';
+    }
+  });
+
+  // Выход
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    auth.signOut();
+  });
+
+  // Назад из чата
+  chatBackBtn.addEventListener('click', closeChat);
+
+  // Отправка сообщения
+  sendBtn.addEventListener('click', () => sendMessage(messageInput.value));
   messageInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -674,44 +1030,62 @@
     messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
   });
 
-  // Выход
-  logoutBtn.addEventListener('click', () => auth.signOut());
+  // Кнопка прокрутки
+  messagesArea.addEventListener('scroll', () => {
+    const threshold = 100;
+    const atBottom = messagesArea.scrollHeight - messagesArea.scrollTop - messagesArea.clientHeight < threshold;
+    scrollDownBtn.style.display = atBottom ? 'none' : 'flex';
+  });
+  scrollDownBtn.addEventListener('click', scrollToBottom);
 
-  // Вход / регистрация
-  document.getElementById('btn-login').addEventListener('click', () => {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    auth.signInWithEmailAndPassword(email, password)
-      .then(() => { statusEl.textContent = '✅ Вход выполнен'; statusEl.style.color = '#34c759'; })
-      .catch(e => { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#ff3b30'; });
+  // Поиск пользователей
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    const query = searchInput.value.trim();
+    searchTimeout = setTimeout(() => searchUsers(query), 300);
   });
 
-  document.getElementById('btn-register').addEventListener('click', () => {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    auth.createUserWithEmailAndPassword(email, password)
-      .then(() => { statusEl.textContent = '✅ Аккаунт создан'; statusEl.style.color = '#34c759'; })
-      .catch(e => { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#ff3b30'; });
+  // Гифки
+  gifBtn.addEventListener('click', openGifPopup);
+  gifClose.addEventListener('click', closeGifPopup);
+  gifPopup.addEventListener('click', (e) => {
+    if (e.target === gifPopup) closeGifPopup();
+  });
+
+  gifSearch.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    const query = gifSearch.value.trim();
+    if (query.length < 2) {
+      gifGrid.innerHTML = '<div class="placeholder">Введите запрос</div>';
+      return;
+    }
+    searchTimeout = setTimeout(() => searchGifs(query), 400);
   });
 
   // ------------------------------------------------------------
-  // 9. ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ ПОЛЬЗОВАТЕЛЯ
+  // 12. ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ ПОЛЬЗОВАТЕЛЯ
   // ------------------------------------------------------------
   auth.onAuthStateChanged((user) => {
     if (user) {
       loginPage.style.display = 'none';
       chatPage.style.display = 'flex';
-      listenMessages();
+      startScreen.classList.add('active');
+      chatScreen.classList.remove('active');
+      renderChatList();
     } else {
       loginPage.style.display = 'flex';
       chatPage.style.display = 'none';
-      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+      if (chatsListener) { chatsListener(); chatsListener = null; }
+      if (messagesListener) { messagesListener(); messagesListener = null; }
+      chatList.innerHTML = '';
       messagesArea.innerHTML = '';
+      currentChatId = null;
+      currentChatUser = null;
       statusEl.textContent = '';
     }
   });
 
-  console.log('✅ Чат запущен!');
+  console.log('✅ Чат с личными сообщениями запущен!');
 </script>
 
 </body>
