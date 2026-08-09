@@ -12,12 +12,16 @@
     /* ==========================================================
        ГЛОБАЛЬНЫЙ СТИЛЬ
     ========================================================== */
+    * {
+      box-sizing: border-box;
+    }
     body {
-      background: #f0f2f5;
+      background: #e5e5ea;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
     }
 
-    /* Скрываем чат по умолчанию */
     #chat-page { display: none; }
 
     /* ==========================================================
@@ -183,7 +187,6 @@
       color: rgba(255,255,255,0.7);
     }
 
-    /* Контейнер сообщений */
     .messages-content {
       padding: 12px 16px 80px 16px;
       display: flex;
@@ -191,42 +194,49 @@
     }
 
     /* ==========================================================
-       ПАНЕЛЬ ВВОДА – ПРОФЕССИОНАЛЬНЫЙ СТИЛЬ
+       ПАНЕЛЬ ВВОДА – ТЕЛЕГА-СТАЙЛ
     ========================================================== */
     .toolbar.messagebar {
-      background: #ffffff;
-      border-top: 1px solid rgba(0, 0, 0, 0.08);
-      padding: 6px 12px;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
       position: sticky;
       bottom: 0;
+      background: #f8f8fa;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      padding: 6px 10px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
+      min-height: 56px;
+      display: flex;
+      align-items: center;
     }
 
     .toolbar-inner {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      width: 100%;
       flex-wrap: nowrap;
     }
 
+    /* Контейнер для поля ввода и кнопки гифки */
     .messagebar-area {
       display: flex;
       align-items: center;
       flex: 1;
-      background: #f4f6f9;
-      border-radius: 24px;
-      padding: 2px 12px;
+      background: white;
+      border-radius: 30px;
+      padding: 0 16px;
       min-height: 44px;
+      border: 1px solid #e5e5ea;
       transition: 0.2s;
+      gap: 6px;
     }
 
     .messagebar-area:focus-within {
-      background: #eef0f3;
-      box-shadow: 0 0 0 2px #007aff33;
+      border-color: #007aff;
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
     }
 
-    /* Кнопка с гифкой */
-    .messagebar-area .button {
+    /* Кнопка гифки */
+    .btn-gif {
       background: none;
       border: none;
       font-size: 24px;
@@ -235,16 +245,24 @@
       color: #666;
       transition: 0.15s;
       flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      width: 36px;
+      border-radius: 50%;
     }
-    .messagebar-area .button:active {
-      transform: scale(0.85);
+    .btn-gif:active {
+      background: rgba(0,0,0,0.05);
+      transform: scale(0.92);
     }
 
     /* Поле ввода */
     .messagebar-textarea {
       border: none;
       background: transparent;
-      padding: 10px 8px;
+      padding: 8px 0;
       font-size: 16px;
       line-height: 1.4;
       resize: none;
@@ -260,25 +278,33 @@
       color: #8e8e93;
     }
 
-    /* Кнопка "Отправить" – компактная и стильная */
-    #btn-send {
+    /* Кнопка отправки – иконка, как в Telegram */
+    .btn-send {
       background: #007aff;
       color: white;
       border: none;
-      border-radius: 24px;
-      padding: 6px 18px;
-      font-weight: 600;
-      font-size: 14px;
-      height: 36px;
-      line-height: 36px;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
       transition: 0.15s;
-      min-width: 60px;
-      box-shadow: 0 2px 6px rgba(0, 122, 255, 0.25);
+      box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
     }
-    #btn-send:active {
-      transform: scale(0.94);
+    .btn-send:active {
+      transform: scale(0.9);
       box-shadow: none;
+    }
+    .btn-send:disabled {
+      background: #c7c7cc;
+      box-shadow: none;
+      cursor: default;
     }
 
     /* ==========================================================
@@ -325,7 +351,6 @@
       transform: scale(1.04);
       box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     }
-
     .gif-grid .placeholder {
       color: #8e8e93;
       font-size: 15px;
@@ -343,6 +368,11 @@
       }
       .message-image img {
         max-width: 160px;
+      }
+      .btn-send {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
       }
     }
   </style>
@@ -401,14 +431,14 @@
           <div class="messages-content"></div>
         </div>
       </div>
-      <!-- Панель ввода -->
+      <!-- Панель ввода – правильная структура -->
       <div class="toolbar messagebar">
         <div class="toolbar-inner">
           <div class="messagebar-area">
-            <button id="btn-gif" class="button">🎬</button>
-            <textarea placeholder="Сообщение..." id="message-input" class="messagebar-textarea"></textarea>
+            <button id="btn-gif" class="btn-gif">🎬</button>
+            <textarea placeholder="Сообщение..." id="message-input" class="messagebar-textarea" rows="1"></textarea>
           </div>
-          <button class="button" id="btn-send">Отправить</button>
+          <button class="btn-send" id="btn-send">➤</button>
         </div>
       </div>
     </div>
@@ -478,6 +508,7 @@
   const messageInput = document.getElementById('message-input');
   const gifGrid = document.getElementById('gif-grid');
   const gifSearchInput = document.getElementById('gif-search-input');
+  const sendBtn = document.getElementById('btn-send');
 
   // ==========================================================
   // 3. ФУНКЦИИ ОТОБРАЖЕНИЯ СООБЩЕНИЙ
@@ -563,6 +594,7 @@
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
       messageInput.value = '';
+      sendBtn.disabled = true;
     } catch (error) {
       app.dialog.alert('Ошибка: ' + error.message);
     }
@@ -639,7 +671,7 @@
   }
 
   // ==========================================================
-  // 7. ОБРАБОТЧИКИ КНОПОК (ВХОД, ВЫХОД, ОТПРАВКА)
+  // 7. ОБРАБОТЧИКИ КНОПОК
   // ==========================================================
   document.getElementById('btn-login').addEventListener('click', async () => {
     const email = document.getElementById('login-email').value;
@@ -671,7 +703,12 @@
     auth.signOut();
   });
 
-  document.getElementById('btn-send').addEventListener('click', sendMessage);
+  sendBtn.addEventListener('click', sendMessage);
+
+  messageInput.addEventListener('input', () => {
+    sendBtn.disabled = messageInput.value.trim().length === 0;
+  });
+
   messageInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -687,6 +724,8 @@
       loginPage.style.display = 'none';
       chatPage.style.display = 'block';
       listenMessages();
+      // После входа активируем кнопку
+      sendBtn.disabled = true;
     } else {
       loginPage.style.display = 'block';
       chatPage.style.display = 'none';
@@ -695,7 +734,7 @@
     }
   });
 
-  console.log('✅ Чат запущен! Дизайн обновлён.');
+  console.log('✅ Чат запущен! Интерфейс исправлен.');
 </script>
 </body>
 </html>
