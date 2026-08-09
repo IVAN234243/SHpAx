@@ -1,346 +1,718 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Чат</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Чат</title>
 
-    <!-- Подключаем стили QuikChat -->
-    <link rel="stylesheet" href="https://unpkg.com/quikchat/dist/quikchat.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-    <style>
-        /* --- Стили для страницы входа --- */
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+  <style>
+    /* --- Сброс --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #e5e5ea;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
 
-        #login-page {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 24px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            width: 100%;
-            max-width: 360px;
-            box-sizing: border-box;
-            display: block;
-        }
+    /* --- Контейнер приложения --- */
+    #app {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 800px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
 
-        #login-page h2 {
-            text-align: center;
-            color: #1a1a2e;
-            font-weight: 600;
-            margin-top: 0;
-            margin-bottom: 25px;
-        }
+    /* --- Страница входа --- */
+    #login-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 30px 24px;
+      background: white;
+    }
+    #login-page h2 {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #1c1c1e;
+    }
+    #login-page input {
+      width: 100%;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      border: 1px solid #d1d1d6;
+      border-radius: 16px;
+      font-size: 16px;
+      background: #f2f2f7;
+      transition: 0.2s;
+    }
+    #login-page input:focus {
+      border-color: #007aff;
+      background: white;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
+    }
+    #login-page button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: 0.15s;
+      margin-top: 6px;
+    }
+    #login-page button:active { transform: scale(0.97); }
+    .btn-login { background: #007aff; }
+    .btn-register { background: #34c759; }
+    #login-status {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 14px;
+      min-height: 20px;
+      color: #ff3b30;
+    }
 
-        #login-page input {
-            width: 100%;
-            padding: 14px 16px;
-            margin-bottom: 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 16px;
-            box-sizing: border-box;
-            background: #f4f6f9;
-            transition: 0.2s;
-        }
+    /* --- Чат --- */
+    #chat-page {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      background: white;
+    }
 
-        #login-page input:focus {
-            outline: none;
-            border-color: #007aff;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
-        }
+    /* Верхняя панель */
+    .chat-header {
+      padding: 16px 20px;
+      background: white;
+      border-bottom: 1px solid #e5e5ea;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .chat-header .title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1c1c1e;
+    }
+    .chat-header .logout-btn {
+      background: none;
+      border: none;
+      color: #007aff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 12px;
+    }
+    .chat-header .logout-btn:active { opacity: 0.6; }
 
-        #login-page button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            color: white;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-bottom: 10px;
-        }
+    /* Область сообщений */
+    .messages-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 8px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #f2f2f7;
+    }
+    .messages-area::-webkit-scrollbar {
+      width: 4px;
+    }
+    .messages-area::-webkit-scrollbar-thumb {
+      background: #c6c6c8;
+      border-radius: 10px;
+    }
 
-        #login-page .btn-login {
-            background: #007aff;
-        }
-        #login-page .btn-login:active { transform: scale(0.97); }
+    /* Сообщение */
+    .message {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 20px;
+      font-size: 16px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      position: relative;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      animation: fadeUp 0.2s ease-out;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-        #login-page .btn-register {
-            background: #34c759;
-        }
-        #login-page .btn-register:active { transform: scale(0.97); }
+    .message-sent {
+      background: #007aff;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 6px;
+    }
+    .message-received {
+      background: white;
+      color: #1c1c1e;
+      align-self: flex-start;
+      border-bottom-left-radius: 6px;
+    }
 
-        #login-status {
-            text-align: center;
-            font-size: 14px;
-            margin-top: 10px;
-            min-height: 20px;
-        }
+    .message .sender {
+      font-size: 12px;
+      font-weight: 600;
+      color: #8e8e93;
+      margin-bottom: 2px;
+      display: block;
+    }
+    .message-sent .sender { color: rgba(255,255,255,0.7); }
 
-        /* --- Стили для страницы чата --- */
-        #chat-page {
-            display: none;
-            width: 100%;
-            height: 100vh;
-            flex-direction: column;
-            background: #f0f2f5;
-        }
+    .message .text { margin: 0; }
 
-        /* Кастомный навбар */
-        .custom-navbar {
-            background: white;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            flex-shrink: 0;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
+    .message .gif-image {
+      max-width: 200px;
+      border-radius: 16px;
+      margin-top: 4px;
+      display: block;
+    }
 
-        .custom-navbar .title {
-            font-weight: 700;
-            font-size: 18px;
-            color: #1a1a2e;
-        }
+    .message .timestamp {
+      font-size: 10px;
+      color: #8e8e93;
+      margin-top: 4px;
+      text-align: right;
+    }
+    .message-sent .timestamp { color: rgba(255,255,255,0.6); }
 
-        .custom-navbar .logout-btn {
-            background: none;
-            border: none;
-            color: #007aff;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 8px 12px;
-        }
-        .custom-navbar .logout-btn:active { opacity: 0.6; }
+    /* Панель ввода */
+    .input-area {
+      background: white;
+      border-top: 1px solid #e5e5ea;
+      padding: 8px 12px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+    .input-area .gif-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      line-height: 1;
+      padding: 4px 6px;
+      cursor: pointer;
+      color: #666;
+      transition: 0.15s;
+    }
+    .input-area .gif-btn:active { transform: scale(0.85); }
 
-        /* Контейнер для виджета QuikChat */
-        #chat-widget-container {
-            flex: 1;
-            min-height: 0;
-            padding: 10px;
-            background: transparent;
-        }
+    .input-area textarea {
+      flex: 1;
+      border: 1px solid #d1d1d6;
+      border-radius: 24px;
+      padding: 10px 16px;
+      font-size: 16px;
+      resize: none;
+      outline: none;
+      min-height: 44px;
+      max-height: 120px;
+      font-family: inherit;
+      background: #f2f2f7;
+      transition: 0.2s;
+    }
+    .input-area textarea:focus {
+      border-color: #007aff;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
+    }
 
-        /* Переопределяем стили QuikChat, чтобы он вписался в наш дизайн */
-        quik-chat {
-            display: block;
-            width: 100%;
-            height: 100%;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-            background: white;
-        }
+    .input-area .send-btn {
+      background: #007aff;
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 24px;
+      cursor: pointer;
+      height: 44px;
+      transition: 0.15s;
+      flex-shrink: 0;
+    }
+    .input-area .send-btn:active { transform: scale(0.94); }
 
-        /* Адаптивность */
-        @media (max-width: 480px) {
-            #login-page { padding: 30px 20px; margin: 20px; }
-        }
-    </style>
+    /* Кнопка прокрутки вниз */
+    .scroll-down-btn {
+      position: absolute;
+      bottom: 90px;
+      right: 20px;
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      z-index: 10;
+    }
+    .scroll-down-btn:active { transform: scale(0.92); }
+
+    /* Попап для гифок */
+    .gif-popup {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .gif-popup.active { display: flex; }
+
+    .gif-popup-content {
+      background: white;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 70%;
+      padding: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .gif-popup-content .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .gif-popup-content .header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .gif-popup-content .header .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #8e8e93;
+    }
+    .gif-popup-content input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      border: 1px solid #d1d1d6;
+      font-size: 16px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .gif-popup-content input:focus {
+      border-color: #007aff;
+    }
+    .gif-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      overflow-y: auto;
+      max-height: 300px;
+      justify-content: center;
+      padding: 4px 0;
+    }
+    .gif-grid img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .gif-grid img:hover {
+      transform: scale(1.04);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .gif-grid .placeholder {
+      color: #8e8e93;
+      font-size: 15px;
+      padding: 20px 0;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Адаптив */
+    @media (max-width: 480px) {
+      #app { max-height: 100vh; border-radius: 0; }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- ===== СТРАНИЦА ВХОДА ===== -->
-    <div id="login-page">
-        <h2>💬 Вход в чат</h2>
-        <input type="email" id="login-email" placeholder="Email" value="test@mail.com">
-        <input type="password" id="login-password" placeholder="Пароль" value="123456">
-        <button class="btn-login" id="btn-login">Войти</button>
-        <button class="btn-register" id="btn-register">Создать аккаунт</button>
-        <div id="login-status"></div>
+<div id="app">
+
+  <!-- ===== СТРАНИЦА ВХОДА ===== -->
+  <div id="login-page">
+    <h2>💬 Чат</h2>
+    <input type="email" id="login-email" placeholder="Email" value="test@mail.com">
+    <input type="password" id="login-password" placeholder="Пароль" value="123456">
+    <button class="btn-login" id="btn-login">Войти</button>
+    <button class="btn-register" id="btn-register">Создать аккаунт</button>
+    <div id="login-status"></div>
+  </div>
+
+  <!-- ===== СТРАНИЦА ЧАТА ===== -->
+  <div id="chat-page">
+    <!-- Шапка -->
+    <div class="chat-header">
+      <span class="title">💬 Общий чат</span>
+      <button class="logout-btn" id="btn-logout">Выйти</button>
     </div>
 
-    <!-- ===== СТРАНИЦА ЧАТА ===== -->
-    <div id="chat-page">
-        <div class="custom-navbar">
-            <span class="title">💬 Общий чат</span>
-            <button class="logout-btn" id="btn-logout">Выйти</button>
-        </div>
-        <div id="chat-widget-container">
-            <!-- Сюда QuikChat отрендерит свой интерфейс -->
-        </div>
+    <!-- Область сообщений -->
+    <div class="messages-area" id="messages-area"></div>
+
+    <!-- Кнопка прокрутки вниз -->
+    <button class="scroll-down-btn" id="scroll-down-btn">↓</button>
+
+    <!-- Панель ввода -->
+    <div class="input-area">
+      <button class="gif-btn" id="gif-btn">🎬</button>
+      <textarea id="message-input" placeholder="Сообщение..." rows="1"></textarea>
+      <button class="send-btn" id="send-btn">Отправить</button>
     </div>
+  </div>
 
-    <!-- ===== ПОДКЛЮЧЕНИЕ БИБЛИОТЕК ===== -->
+  <!-- ===== ПОПАП ДЛЯ ГИФОК ===== -->
+  <div class="gif-popup" id="gif-popup">
+    <div class="gif-popup-content">
+      <div class="header">
+        <h3>Поиск GIF</h3>
+        <button class="close-btn" id="gif-popup-close">✕</button>
+      </div>
+      <input type="search" id="gif-search-input" placeholder="Найти гифку...">
+      <div class="gif-grid" id="gif-grid">
+        <div class="placeholder">Введите запрос</div>
+      </div>
+    </div>
+  </div>
 
-    <!-- 1. Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</div>
 
-    <!-- 2. QuikChat JS -->
-    <script src="https://unpkg.com/quikchat"></script>
+<!-- ========================================================== -->
+<!--                         СКРИПТЫ                              -->
+<!-- ========================================================== -->
+<script>
+  // ------------------------------------------------------------
+  // 1. КОНФИГ FIREBASE (твой)
+  // ------------------------------------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyAXlZnWxnf0hNyGP8Xdx7t8YYHIFXwMZ5Q",
+    authDomain: "shpax-a1451.firebaseapp.com",
+    projectId: "shpax-a1451",
+    storageBucket: "shpax-a1451.firebasestorage.app",
+    appId: "1:854026805745:web:21dbb257fd46c0462d6450"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-    <!-- ===== ОСНОВНОЙ СКРИПТ ===== -->
-    <script>
-        // ---------------------------------------------
-        // 1. КОНФИГ FIREBASE (твой)
-        // ---------------------------------------------
-        const firebaseConfig = {
-            apiKey: "AIzaSyAXlZnWxnf0hNyGP8Xdx7t8YYHIFXwMZ5Q",
-            authDomain: "shpax-a1451.firebaseapp.com",
-            projectId: "shpax-a1451",
-            storageBucket: "shpax-a1451.firebasestorage.app",
-            appId: "1:854026805745:web:21dbb257fd46c0462d6450"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+  // ------------------------------------------------------------
+  // 2. ДОМ-ЭЛЕМЕНТЫ
+  // ------------------------------------------------------------
+  const loginPage = document.getElementById('login-page');
+  const chatPage = document.getElementById('chat-page');
+  const statusEl = document.getElementById('login-status');
+  const messagesArea = document.getElementById('messages-area');
+  const messageInput = document.getElementById('message-input');
+  const sendBtn = document.getElementById('send-btn');
+  const logoutBtn = document.getElementById('btn-logout');
+  const scrollDownBtn = document.getElementById('scroll-down-btn');
 
-        // ---------------------------------------------
-        // 2. DOM-ЭЛЕМЕНТЫ
-        // ---------------------------------------------
-        const loginPage = document.getElementById('login-page');
-        const chatPage = document.getElementById('chat-page');
-        const statusEl = document.getElementById('login-status');
-        const container = document.getElementById('chat-widget-container');
+  // Гифки
+  const gifBtn = document.getElementById('gif-btn');
+  const gifPopup = document.getElementById('gif-popup');
+  const gifClose = document.getElementById('gif-popup-close');
+  const gifSearch = document.getElementById('gif-search-input');
+  const gifGrid = document.getElementById('gif-grid');
+  const GIPHY_API_KEY = 'HnlRtWo9NXAw0vw8a9ZsqrDLuTAAHPfW';
 
-        // ---------------------------------------------
-        // 3. ИНИЦИАЛИЗАЦИЯ QUIKCHAT
-        // ---------------------------------------------
-        let chat = null;
+  // ------------------------------------------------------------
+  // 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+  // ------------------------------------------------------------
+  function getInitials(name) {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  }
 
-        function initChat() {
-            if (chat) return;
+  function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    return `hsl(${Math.abs(hash) % 360}, 70%, 60%)`;
+  }
 
-            // Создаём виджет чата
-            chat = new quikchat('#chat-widget-container', async (instance, message) => {
-                // Это колбэк, когда пользователь отправляет сообщение
-                const user = auth.currentUser;
-                if (!user) return;
+  // ------------------------------------------------------------
+  // 4. ОТОБРАЖЕНИЕ СООБЩЕНИЙ
+  // ------------------------------------------------------------
+  function addMessageToUI(data) {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
 
-                try {
-                    // Сохраняем сообщение в Firebase
-                    await db.collection('messages').add({
-                        text: message,
-                        senderId: user.uid,
-                        senderName: user.displayName || user.email || 'Аноним',
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } catch (error) {
-                    console.error('Ошибка отправки:', error);
-                    instance.messageAddNew('❌ Ошибка отправки. Попробуйте позже.', 'Система', 'left');
-                }
-            });
+    const isMine = data.senderId === currentUser.uid;
+    const senderName = data.senderName || 'Аноним';
 
-            // Добавляем приветственное сообщение
-            chat.messageAddNew('👋 Добро пожаловать в чат!', 'Система', 'left');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${isMine ? 'message-sent' : 'message-received'}`;
 
-            // Начинаем слушать новые сообщения из Firebase
-            listenMessages();
-        }
+    // Имя отправителя
+    const senderSpan = document.createElement('span');
+    senderSpan.className = 'sender';
+    senderSpan.textContent = senderName;
+    msgDiv.appendChild(senderSpan);
 
-        // ---------------------------------------------
-        // 4. ПОЛУЧЕНИЕ СООБЩЕНИЙ ИЗ FIREBASE
-        // ---------------------------------------------
-        let isFirstLoad = true;
+    // Текст или гифка
+    if (data.text) {
+      const textP = document.createElement('div');
+      textP.className = 'text';
+      textP.textContent = data.text;
+      msgDiv.appendChild(textP);
+    } else if (data.gifUrl) {
+      const img = document.createElement('img');
+      img.className = 'gif-image';
+      img.src = data.gifUrl;
+      img.alt = 'GIF';
+      msgDiv.appendChild(img);
+    }
 
-        function listenMessages() {
-            db.collection('messages')
-                .orderBy('timestamp', 'asc')
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === 'added') {
-                            const data = change.doc.data();
-                            // Пропускаем сообщения, отправленные текущим пользователем
-                            // (они уже добавлены в UI через колбэк)
-                            if (data.senderId === auth.currentUser?.uid) return;
+    // Время
+    const timeSpan = document.createElement('div');
+    timeSpan.className = 'timestamp';
+    timeSpan.textContent = new Date(data.timestamp?.toMillis?.() || Date.now()).toLocaleTimeString();
+    msgDiv.appendChild(timeSpan);
 
-                            const senderName = data.senderName || 'Аноним';
-                            // Определяем сторону сообщения (слева — от других)
-                            const position = 'left';
-                            // Отображаем сообщение в чате
-                            chat?.messageAddNew(data.text || '🖼️ Гифка', senderName, position);
-                        }
-                    });
-                }, (error) => {
-                    console.error('Ошибка подписки:', error);
-                });
-        }
+    messagesArea.appendChild(msgDiv);
+    scrollToBottom();
+  }
 
-        // ---------------------------------------------
-        // 5. ФУНКЦИИ ВХОДА / РЕГИСТРАЦИИ / ВЫХОДА
-        // ---------------------------------------------
-        async function login(email, password) {
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                statusEl.textContent = '✅ Вход выполнен';
-                statusEl.style.color = '#34c759';
-            } catch (e) {
-                statusEl.textContent = '❌ ' + e.message;
-                statusEl.style.color = '#ff3b30';
-            }
-        }
+  function scrollToBottom() {
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+  }
 
-        async function register(email, password) {
-            try {
-                await auth.createUserWithEmailAndPassword(email, password);
-                statusEl.textContent = '✅ Аккаунт создан';
-                statusEl.style.color = '#34c759';
-            } catch (e) {
-                statusEl.textContent = '❌ ' + e.message;
-                statusEl.style.color = '#ff3b30';
-            }
-        }
+  // Показывать кнопку прокрутки, если не внизу
+  messagesArea.addEventListener('scroll', () => {
+    const threshold = 100;
+    const atBottom = messagesArea.scrollHeight - messagesArea.scrollTop - messagesArea.clientHeight < threshold;
+    scrollDownBtn.style.display = atBottom ? 'none' : 'flex';
+  });
+  scrollDownBtn.addEventListener('click', scrollToBottom);
 
-        function logout() {
-            auth.signOut();
-        }
+  // ------------------------------------------------------------
+  // 5. ПОДПИСКА НА НОВЫЕ СООБЩЕНИЯ
+  // ------------------------------------------------------------
+  let unsubscribe = null;
 
-        // ---------------------------------------------
-        // 6. ОБРАБОТЧИКИ КНОПОК
-        // ---------------------------------------------
-        document.getElementById('btn-login').addEventListener('click', () => {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            login(email, password);
+  function listenMessages() {
+    if (unsubscribe) unsubscribe();
+    messagesArea.innerHTML = '';
+
+    unsubscribe = db.collection('messages')
+      .orderBy('timestamp', 'asc')
+      .onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            addMessageToUI(change.doc.data());
+          }
         });
+      }, (error) => {
+        console.error('Ошибка подписки:', error);
+      });
+  }
 
-        document.getElementById('btn-register').addEventListener('click', () => {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            register(email, password);
-        });
+  // ------------------------------------------------------------
+  // 6. ОТПРАВКА СООБЩЕНИЙ
+  // ------------------------------------------------------------
+  async function sendMessage(text) {
+    const user = auth.currentUser;
+    if (!user) { alert('Вы не авторизованы!'); return; }
+    if (!text || !text.trim()) return;
 
-        document.getElementById('btn-logout').addEventListener('click', logout);
+    try {
+      await db.collection('messages').add({
+        text: text.trim(),
+        senderId: user.uid,
+        senderName: user.displayName || user.email || 'Аноним',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+    } catch (e) {
+      alert('Ошибка отправки: ' + e.message);
+    }
+  }
 
-        // ---------------------------------------------
-        // 7. ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ ПОЛЬЗОВАТЕЛЯ
-        // ---------------------------------------------
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // Пользователь залогинен — показываем чат
-                loginPage.style.display = 'none';
-                chatPage.style.display = 'flex';
-                initChat(); // Инициализируем виджет, если ещё не создан
-            } else {
-                // Пользователь вышел — показываем экран входа
-                loginPage.style.display = 'block';
-                chatPage.style.display = 'none';
-                // Удаляем виджет, чтобы при следующем входе он создался заново
-                if (chat) {
-                    // Просто очищаем контейнер
-                    container.innerHTML = '';
-                    chat = null;
-                }
-                statusEl.textContent = '';
-            }
-        });
+  // Отправка гифки
+  async function sendGifMessage(gifUrl) {
+    const user = auth.currentUser;
+    if (!user) { alert('Вы не авторизованы!'); return; }
+    try {
+      await db.collection('messages').add({
+        gifUrl: gifUrl,
+        senderId: user.uid,
+        senderName: user.displayName || user.email || 'Аноним',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      closeGifPopup();
+    } catch (e) {
+      alert('Ошибка отправки гифки: ' + e.message);
+    }
+  }
 
-        console.log('✅ Чат на QuikChat запущен!');
-    </script>
+  // ------------------------------------------------------------
+  // 7. ГИФКИ (GIPHY)
+  // ------------------------------------------------------------
+  let searchTimeout;
+
+  function openGifPopup() {
+    gifPopup.classList.add('active');
+    gifSearch.value = '';
+    gifGrid.innerHTML = '<div class="placeholder">Введите запрос</div>';
+    gifSearch.focus();
+  }
+
+  function closeGifPopup() {
+    gifPopup.classList.remove('active');
+  }
+
+  gifBtn.addEventListener('click', openGifPopup);
+  gifClose.addEventListener('click', closeGifPopup);
+  gifPopup.addEventListener('click', (e) => {
+    if (e.target === gifPopup) closeGifPopup();
+  });
+
+  gifSearch.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    const query = gifSearch.value.trim();
+    if (query.length < 2) {
+      gifGrid.innerHTML = '<div class="placeholder">Введите запрос</div>';
+      return;
+    }
+    searchTimeout = setTimeout(() => searchGifs(query), 400);
+  });
+
+  async function searchGifs(query) {
+    try {
+      const url = `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=20&rating=g`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+      if (!data.data || data.data.length === 0) {
+        gifGrid.innerHTML = '<div class="placeholder">Ничего не найдено 😕</div>';
+        return;
+      }
+      renderGifs(data.data);
+    } catch (e) {
+      console.error(e);
+      gifGrid.innerHTML = '<div class="placeholder">Ошибка загрузки</div>';
+    }
+  }
+
+  function renderGifs(gifs) {
+    gifGrid.innerHTML = '';
+    gifs.forEach(gif => {
+      const img = document.createElement('img');
+      img.src = gif.images.fixed_height_small.url;
+      img.alt = gif.title || 'GIF';
+      img.addEventListener('click', () => {
+        sendGifMessage(gif.images.fixed_height.url);
+      });
+      gifGrid.appendChild(img);
+    });
+  }
+
+  // ------------------------------------------------------------
+  // 8. ОБРАБОТЧИКИ СОБЫТИЙ
+  // ------------------------------------------------------------
+  // Отправка по кнопке
+  sendBtn.addEventListener('click', () => sendMessage(messageInput.value));
+
+  // Отправка по Enter
+  messageInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(messageInput.value);
+    }
+  });
+
+  // Авто-высота textarea
+  messageInput.addEventListener('input', () => {
+    messageInput.style.height = 'auto';
+    messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+  });
+
+  // Выход
+  logoutBtn.addEventListener('click', () => auth.signOut());
+
+  // Вход / регистрация
+  document.getElementById('btn-login').addEventListener('click', () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => { statusEl.textContent = '✅ Вход выполнен'; statusEl.style.color = '#34c759'; })
+      .catch(e => { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#ff3b30'; });
+  });
+
+  document.getElementById('btn-register').addEventListener('click', () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(() => { statusEl.textContent = '✅ Аккаунт создан'; statusEl.style.color = '#34c759'; })
+      .catch(e => { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#ff3b30'; });
+  });
+
+  // ------------------------------------------------------------
+  // 9. ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ ПОЛЬЗОВАТЕЛЯ
+  // ------------------------------------------------------------
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      loginPage.style.display = 'none';
+      chatPage.style.display = 'flex';
+      listenMessages();
+    } else {
+      loginPage.style.display = 'flex';
+      chatPage.style.display = 'none';
+      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+      messagesArea.innerHTML = '';
+      statusEl.textContent = '';
+    }
+  });
+
+  console.log('✅ Чат запущен!');
+</script>
+
 </body>
 </html>
