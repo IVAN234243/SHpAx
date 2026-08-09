@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Чат</title>
+
+  <!-- Framework7 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/framework7/framework7-bundle.min.css">
+
+  <style>
+    /* ==========================================================
+       ГЛОБАЛЬНЫЙ СТИЛЬ
+    ========================================================== */
+    body {
+      background: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* Скрываем чат по умолчанию */
+    #chat-page { display: none; }
+
+    /* ==========================================================
+       СТРАНИЦА ВХОДА
+    ========================================================== */
+    #login-page .block-strong {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      padding: 30px 20px;
+      margin-top: 40px !important;
+    }
+    #login-page h2 {
+      color: #1a1a2e;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    #login-page .list {
+      margin-bottom: 20px;
+    }
+    #login-page .item-input {
+      border-radius: 12px;
+      background: #f4f6f9;
+      padding: 4px 16px;
+    }
+    #login-page .item-input input {
+      background: transparent;
+      color: #1a1a2e;
+      font-size: 16px;
+    }
+    #login-page .button {
+      border-radius: 30px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      height: 48px;
+      line-height: 48px;
+      background: #007aff;
+      color: white;
+      border: none;
+      transition: 0.2s;
+    }
+    #login-page .button.color-blue {
+      background: #34c759;
+    }
+    #login-page .button:active {
+      transform: scale(0.97);
+    }
+    #login-status {
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    /* ==========================================================
+       ЧАТ – НАВБАР
+    ========================================================== */
+    .navbar {
+      background: white !important;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .navbar .title {
+      color: #1a1a2e;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .navbar .link {
+      color: #007aff;
+      font-weight: 600;
+    }
+
+    /* ==========================================================
+       СООБЩЕНИЯ
+    ========================================================== */
+    .message {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+      max-width: 80%;
+      animation: fadeInUp 0.25s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-sent {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .message-received {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+      margin-bottom: 4px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .message-name {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+      margin-bottom: 2px;
+      padding: 0 4px;
+    }
+
+    .message-bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.45;
+      word-break: break-word;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      position: relative;
+    }
+
+    .message-sent .message-bubble {
+      background: #007aff;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .message-received .message-bubble {
+      background: white;
+      color: #1a1a2e;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-text {
+      margin: 0;
+    }
+
+    .message-image img {
+      max-width: 220px;
+      border-radius: 16px;
+      margin-top: 6px;
+      display: block;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .message-timestamp {
+      font-size: 10px;
+      color: #8e8e93;
+      margin-top: 3px;
+      padding: 0 4px;
+      letter-spacing: 0.2px;
+    }
+
+    .message-sent .message-timestamp {
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* Контейнер сообщений */
+    .messages-content {
+      padding: 12px 16px 80px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================================
+       ПАНЕЛЬ ВВОДА (messagebar)
+    ========================================================== */
+    .toolbar.messagebar {
+      background: white;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      padding: 6px 12px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
+    }
+    .toolbar-inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .messagebar-area {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      background: #f4f6f9;
+      border-radius: 30px;
+      padding: 0 16px;
+    }
+    .messagebar-area .button {
+      background: none;
+      border: none;
+      font-size: 26px;
+      line-height: 1;
+      padding: 6px 4px;
+      color: #666;
+      transition: 0.15s;
+    }
+    .messagebar-area .button:active {
+      transform: scale(0.85);
+    }
+    .messagebar-textarea {
+      border: none;
+      background: transparent;
+      padding: 10px 8px;
+      font-size: 16px;
+      line-height: 1.4;
+      resize: none;
+      outline: none;
+      flex: 1;
+      min-height: 20px;
+      max-height: 100px;
+      color: #1a1a2e;
+      font-family: inherit;
+    }
+    .messagebar-textarea::placeholder {
+      color: #8e8e93;
+    }
+
+    #btn-send {
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 8px 22px;
+      font-weight: 600;
+      font-size: 15px;
+      height: 40px;
+      line-height: 40px;
+      flex-shrink: 0;
+      transition: 0.2s;
+    }
+    #btn-send:active {
+      transform: scale(0.94);
+    }
+
+    /* ==========================================================
+       ПОПАП ДЛЯ ГИФОК
+    ========================================================== */
+    .gif-popup .page {
+      background: #f0f2f5;
+    }
+    .gif-popup .navbar {
+      background: white !important;
+      border-bottom: 1px solid #e5e5ea;
+    }
+    .gif-popup .searchbar {
+      background: white;
+      padding: 8px 16px;
+      margin: 0;
+    }
+    .gif-popup .searchbar input {
+      background: #f4f6f9;
+      border-radius: 30px;
+      padding: 10px 18px;
+      border: none;
+      font-size: 16px;
+      width: 100%;
+      outline: none;
+    }
+    .gif-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 12px;
+    }
+    .gif-grid img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .gif-grid img:hover {
+      transform: scale(1.04);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .gif-grid .placeholder {
+      color: #8e8e93;
+      font-size: 15px;
+      padding: 30px 0;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* ==========================================================
+       АДАПТИВНОСТЬ
+    ========================================================== */
+    @media (max-width: 480px) {
+      .message {
+        max-width: 90%;
+      }
+      .message-image img {
+        max-width: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="view view-main">
+
+    <!-- ===== СТРАНИЦА ВХОДА ===== -->
+    <div class="page" id="login-page">
+      <div class="page-content">
+        <div class="block block-strong">
+          <h2>💬 Вход в чат</h2>
+          <div class="list">
+            <ul>
+              <li>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-input">
+                      <input type="email" id="login-email" placeholder="Email" value="test@mail.com">
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="item-content">
+                  <div class="item-inner">
+                    <div class="item-input">
+                      <input type="password" id="login-password" placeholder="Пароль" value="123456">
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <button class="button button-fill button-large" id="btn-login">Войти</button>
+          <button class="button button-fill color-blue" id="btn-register">Создать аккаунт</button>
+          <div id="login-status"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== СТРАНИЦА ЧАТА ===== -->
+    <div class="page" id="chat-page">
+      <div class="navbar">
+        <div class="navbar-inner">
+          <div class="title">💬 Общий чат</div>
+          <div class="right">
+            <a href="#" id="btn-logout" class="link">Выйти</a>
+          </div>
+        </div>
+      </div>
+      <div class="page-content">
+        <div class="messages" id="messages-container">
+          <div class="messages-content"></div>
+        </div>
+      </div>
+      <!-- Панель ввода -->
+      <div class="toolbar messagebar">
+        <div class="toolbar-inner">
+          <div class="messagebar-area">
+            <button id="btn-gif" class="button">🎬</button>
+            <textarea placeholder="Сообщение..." id="message-input" class="messagebar-textarea"></textarea>
+          </div>
+          <button class="button" id="btn-send">Отправить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== POPUP ДЛЯ ГИФОК ===== -->
+    <div class="popup gif-popup" id="gif-popup">
+      <div class="page">
+        <div class="navbar">
+          <div class="navbar-inner">
+            <div class="title">Поиск GIF</div>
+            <div class="right">
+              <a href="#" class="link popup-close">Закрыть</a>
+            </div>
+          </div>
+        </div>
+        <div class="page-content">
+          <div class="searchbar searchbar-gif">
+            <div class="searchbar-inner">
+              <input type="search" placeholder="Найти гифку..." id="gif-search-input">
+            </div>
+          </div>
+          <div class="gif-grid" id="gif-grid">
+            <div class="placeholder">Введите запрос для поиска</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== ПОДКЛЮЧЕНИЕ БИБЛИОТЕК ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/framework7/framework7-bundle.min.js"></script>
+
+<script>
+  // ==========================================================
+  // 1. КОНФИГ FIREBASE (твой)
+  // ==========================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyAXlZnWxnf0hNyGP8Xdx7t8YYHIFXwMZ5Q",
+    authDomain: "shpax-a1451.firebaseapp.com",
+    projectId: "shpax-a1451",
+    storageBucket: "shpax-a1451.firebasestorage.app",
+    appId: "1:854026805745:web:21dbb257fd46c0462d6450"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ==========================================================
+  // 2. FRAMEWORK7
+  // ==========================================================
+  const app = new Framework7({
+    el: '#app',
+    name: 'Чат',
+  });
+  const $$ = Dom7;
+
+  // DOM-элементы
+  const loginPage = document.getElementById('login-page');
+  const chatPage = document.getElementById('chat-page');
+  const statusEl = document.getElementById('login-status');
+  const messagesContent = document.querySelector('.messages-content');
+  const messageInput = document.getElementById('message-input');
+  const gifGrid = document.getElementById('gif-grid');
+  const gifSearchInput = document.getElementById('gif-search-input');
+
+  // ==========================================================
+  // 3. ФУНКЦИИ ОТОБРАЖЕНИЯ СООБЩЕНИЙ
+  // ==========================================================
+  function getInitials(name) {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  }
+
+  function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 70%, 60%)`;
+  }
+
+  function addMessageToUI(data) {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const isMine = data.senderId === currentUser.uid;
+    const senderName = data.senderName || 'Аноним';
+    const initials = getInitials(senderName);
+    const bgColor = stringToColor(senderName);
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isMine ? 'message-sent' : 'message-received'}`;
+
+    let contentHtml = '';
+    if (data.text) contentHtml += `<div class="message-text">${data.text}</div>`;
+    if (data.gifUrl) contentHtml += `<div class="message-image"><img src="${data.gifUrl}" alt="GIF"></div>`;
+
+    messageDiv.innerHTML = `
+      <div class="message-avatar" style="background: ${bgColor}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px;">${initials}</div>
+      <div class="message-name">${senderName}</div>
+      <div class="message-bubble">${contentHtml}</div>
+      <div class="message-timestamp">${new Date(data.timestamp?.toMillis?.() || Date.now()).toLocaleTimeString()}</div>
+    `;
+
+    messagesContent.appendChild(messageDiv);
+    const pageContent = document.querySelector('.page-content');
+    pageContent.scrollTop = pageContent.scrollHeight;
+  }
+
+  // ==========================================================
+  // 4. ПОДПИСКА НА СООБЩЕНИЯ
+  // ==========================================================
+  function listenMessages() {
+    messagesContent.innerHTML = '';
+    db.collection('messages')
+      .orderBy('timestamp', 'asc')
+      .onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            addMessageToUI(change.doc.data());
+          }
+        });
+      }, (error) => {
+        console.error('Ошибка подписки:', error);
+      });
+  }
+
+  // ==========================================================
+  // 5. ОТПРАВКА СООБЩЕНИЯ
+  // ==========================================================
+  async function sendMessage() {
+    const text = messageInput.value.trim();
+    if (!text) return;
+    const user = auth.currentUser;
+    if (!user) {
+      app.dialog.alert('Вы не авторизованы!');
+      return;
+    }
+    try {
+      await db.collection('messages').add({
+        text: text,
+        senderId: user.uid,
+        senderName: user.displayName || user.email || 'Аноним',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      messageInput.value = '';
+    } catch (error) {
+      app.dialog.alert('Ошибка: ' + error.message);
+    }
+  }
+
+  // ==========================================================
+  // 6. GIPHY – ГИФКИ
+  // ==========================================================
+  const GIPHY_API_KEY = 'HnlRtWo9NXAw0vw8a9ZsqrDLuTAAHPfW';
+
+  document.getElementById('btn-gif').addEventListener('click', () => {
+    app.popup.open('#gif-popup');
+  });
+
+  let searchTimeout;
+  gifSearchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    const query = gifSearchInput.value.trim();
+    if (query.length < 2) {
+      gifGrid.innerHTML = '<div class="placeholder">Введите запрос для поиска</div>';
+      return;
+    }
+    searchTimeout = setTimeout(() => searchGifs(query), 400);
+  });
+
+  async function searchGifs(query) {
+    try {
+      const url = `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=20&rating=g`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!data.data || data.data.length === 0) {
+        gifGrid.innerHTML = '<div class="placeholder">Ничего не найдено 😕</div>';
+        return;
+      }
+      renderGifs(data.data);
+    } catch (error) {
+      console.error('Ошибка GIPHY:', error);
+      gifGrid.innerHTML = '<div class="placeholder">Ошибка загрузки гифок</div>';
+    }
+  }
+
+  function renderGifs(gifs) {
+    gifGrid.innerHTML = '';
+    gifs.forEach(gif => {
+      const img = document.createElement('img');
+      img.src = gif.images.fixed_height_small.url;
+      img.alt = gif.title || 'GIF';
+      img.addEventListener('click', () => {
+        sendGifMessage(gif.images.fixed_height.url);
+      });
+      gifGrid.appendChild(img);
+    });
+  }
+
+  async function sendGifMessage(gifUrl) {
+    const user = auth.currentUser;
+    if (!user) {
+      app.dialog.alert('Вы не авторизованы!');
+      return;
+    }
+    try {
+      await db.collection('messages').add({
+        gifUrl: gifUrl,
+        senderId: user.uid,
+        senderName: user.displayName || user.email || 'Аноним',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      app.popup.close('#gif-popup');
+      gifSearchInput.value = '';
+      gifGrid.innerHTML = '<div class="placeholder">Введите запрос для поиска</div>';
+    } catch (error) {
+      app.dialog.alert('Ошибка отправки гифки: ' + error.message);
+    }
+  }
+
+  // ==========================================================
+  // 7. ОБРАБОТЧИКИ КНОПОК (ВХОД, ВЫХОД, ОТПРАВКА)
+  // ==========================================================
+  document.getElementById('btn-login').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      statusEl.textContent = '✅ Вход выполнен';
+      statusEl.style.color = '#34c759';
+    } catch (e) {
+      statusEl.textContent = '❌ ' + e.message;
+      statusEl.style.color = '#ff3b30';
+    }
+  });
+
+  document.getElementById('btn-register').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    try {
+      await auth.createUserWithEmailAndPassword(email, password);
+      statusEl.textContent = '✅ Аккаунт создан';
+      statusEl.style.color = '#34c759';
+    } catch (e) {
+      statusEl.textContent = '❌ ' + e.message;
+      statusEl.style.color = '#ff3b30';
+    }
+  });
+
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    auth.signOut();
+  });
+
+  document.getElementById('btn-send').addEventListener('click', sendMessage);
+  messageInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // ==========================================================
+  // 8. ОТСЛЕЖИВАНИЕ СОСТОЯНИЯ ПОЛЬЗОВАТЕЛЯ
+  // ==========================================================
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      loginPage.style.display = 'none';
+      chatPage.style.display = 'block';
+      listenMessages();
+    } else {
+      loginPage.style.display = 'block';
+      chatPage.style.display = 'none';
+      messagesContent.innerHTML = '';
+      statusEl.textContent = '';
+    }
+  });
+
+  console.log('✅ Чат запущен! Дизайн обновлён.');
+</script>
+</body>
+</html>
