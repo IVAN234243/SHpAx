@@ -254,7 +254,12 @@
   async function searchUsers(query) {
     if (!query || query.length < 2) { searchResults.classList.remove('active'); return; }
     try {
-      const snapshot = await db.collection('users').where('email', '>=', query).where('email', '<=', query + '\uf8ff').limit(10).get();
+      const lowerQuery = query.toLowerCase();
+      const snapshot = await db.collection('users')
+        .where('email', '>=', lowerQuery)
+        .where('email', '<=', lowerQuery + '\uf8ff')
+        .limit(10)
+        .get();
       searchResults.innerHTML = ''; let found = false;
       snapshot.forEach(doc => {
         if (doc.id === auth.currentUser.uid) return; found = true; const data = doc.data(); const div = document.createElement('div'); div.className = 'search-result-item'; div.innerHTML = `<div class="name">${data.name || data.email}</div><div class="email">${data.email}</div>`;
@@ -287,10 +292,30 @@
     const email = document.getElementById('login-email').value, password = document.getElementById('login-password').value;
     auth.signInWithEmailAndPassword(email, password).then(() => { statusEl.textContent = '✅ Вход выполнен'; statusEl.style.color = '#34c759'; }).catch(e => { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#ff3b30'; });
   });
+
   document.getElementById('btn-register').addEventListener('click', async () => {
-    const email = document.getElementById('login-email').value, password = document.getElementById('login-password').value;
-    try { const cred = await auth.createUserWithEmailAndPassword(email, password); await db.collection('users').doc(cred.user.uid).set({ name: email.split('@')[0] || 'Пользователь', email: email, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); statusEl.textContent = '✅ Аккаунт создан'; statusEl.style.color = '#34c759'; } catch (e) { statusEl.textContent = '❌ ' + e.message; statusEl.style.color = '#ff3b30'; }
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    if (!email || !password) { statusEl.textContent = '❌ Введите email и пароль'; statusEl.style.color = '#ff3b30'; return; }
+    try {
+      console.log('📝 Регистрация:', email);
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+      console.log('✅ Auth создан, UID:', cred.user.uid);
+      await db.collection('users').doc(cred.user.uid).set({
+        name: email.split('@')[0] || 'Пользователь',
+        email: email.toLowerCase(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      console.log('✅ Документ users создан');
+      statusEl.textContent = '✅ Аккаунт создан!';
+      statusEl.style.color = '#34c759';
+    } catch (e) {
+      console.error('❌ Ошибка:', e);
+      statusEl.textContent = '❌ ' + e.message;
+      statusEl.style.color = '#ff3b30';
+    }
   });
+
   document.getElementById('btn-logout').addEventListener('click', () => { auth.signOut(); });
   chatBackBtn.addEventListener('click', closeChat);
   sendBtn.addEventListener('click', () => sendMessage(messageInput.value));
@@ -305,10 +330,16 @@
   gifSearch.addEventListener('input', () => { clearTimeout(searchTimeout); const query = gifSearch.value.trim(); if (query.length < 2) { gifGrid.innerHTML = '<div class="placeholder">Введите запрос</div>'; return; } searchTimeout = setTimeout(() => searchGifs(query), 400); });
 
   auth.onAuthStateChanged((user) => {
-    if (user) { loginPage.style.display = 'none'; chatPage.style.display = 'flex'; startScreen.classList.add('active'); chatScreen.classList.remove('active'); renderChatList(); }
-    else { loginPage.style.display = 'flex'; chatPage.style.display = 'none'; if (chatsListener) { chatsListener(); chatsListener = null; } if (messagesListener) { messagesListener(); messagesListener = null; } chatList.innerHTML = ''; messagesArea.innerHTML = ''; currentChatId = null; currentChatUser = null; statusEl.textContent = ''; }
+    if (user) {
+      loginPage.style.display = 'none'; chatPage.style.display = 'flex'; startScreen.classList.add('active'); chatScreen.classList.remove('active'); renderChatList();
+    } else {
+      loginPage.style.display = 'flex'; chatPage.style.display = 'none';
+      if (chatsListener) { chatsListener(); chatsListener = null; }
+      if (messagesListener) { messagesListener(); messagesListener = null; }
+      chatList.innerHTML = ''; messagesArea.innerHTML = ''; currentChatId = null; currentChatUser = null; statusEl.textContent = '';
+    }
   });
-  console.log('✅ Чат с личными сообщениями запущен!');
+  console.log('✅ Чат запущен');
 </script>
 </body>
 </html>
