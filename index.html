@@ -8,6 +8,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
@@ -106,7 +107,7 @@
       background: #121212;
     }
 
-    /* === START SCREEN (список чатов) === */
+    /* === START SCREEN === */
     #start-screen {
       display: none;
       flex-direction: column;
@@ -456,7 +457,7 @@
       border-left-color: #b8a9f0;
     }
 
-    /* === REPLY PANEL (при ответе) === */
+    /* === REPLY PANEL === */
     .reply-panel {
       display: none;
       background: #1e1e1e;
@@ -661,7 +662,7 @@
       width: 100%;
     }
 
-    /* === SCROLLBAR === */
+    /* SCROLLBAR */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
@@ -759,6 +760,7 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+  const messaging = firebase.messaging();
   const GIPHY_API_KEY = 'HnlRtWo9NXAw0vw8a9ZsqrDLuTAAHPfW';
 
   // ==================== DOM ELEMENTS ====================
@@ -788,13 +790,15 @@
   const replyContent = document.getElementById('reply-content');
   const cancelReply = document.getElementById('cancel-reply');
 
+  // ==================== VARIABLES ====================
   let currentChatId = null;
   let currentChatUser = null;
   let chatsListener = null;
   let messagesListener = null;
   let searchTimeout = null;
-  let replyToMessageId = null; // ID сообщения, на которое отвечаем
-  let currentUserPresenceRef = null; // для отслеживания онлайна
+  let replyToMessageId = null;
+  let currentUserPresenceRef = null;
+  let fcmToken = null;
 
   // ==================== HELPERS ====================
   function getInitials(name) {
@@ -813,12 +817,66 @@
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
-  function formatDate(timestamp) {
-    if (!timestamp) return '';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString();
-  }
   function scrollToBottom() { messagesArea.scrollTop = messagesArea.scrollHeight; }
+
+  // ==================== FCM (PUSH) ====================
+  const VAPID_KEY = 'BH6j9az77e4v_Cki4DZvaJZ5Lap-B8aJ4NDly2Fx8yq_e6oo8Q5_qBps1YLEyttWetuzuz03CARihF8n9HQVVDE';
+
+  async function setupFCM() {
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      console.warn('Push не поддерживается');
+      return;
+    }
+    try {
+      // Регистрируем Service Worker
+      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      console.log('Service Worker зарегистрирован');
+      await messaging.useServiceWorker(registration);
+
+      // Проверяем разрешение
+      if (Notification.permission === 'granted') {
+        await updateFCMToken();
+      } else if (Notification.permission === 'default') {
+        const result = await Notification.requestPermission();
+        if (result === 'granted') {
+          await updateFCMToken();
+        }
+      }
+    } catch (err) {
+      console.error('Ошибка регистрации FCM:', err);
+    }
+  }
+
+  async function updateFCMToken() {
+    try {
+      const token = await messaging.getToken({ vapidKey: VAPID_KEY });
+      console.log('FCM Token:', token);
+      const user = auth.currentUser;
+      if (user) {
+        await db.collection('users').doc(user.uid).update({
+          fcmToken: token,
+          fcmTokenUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        fcmToken = token;
+      }
+    } catch (err) {
+      console.error('Ошибка получения токена:', err);
+    }
+  }
+
+  // Обработка сообщений, когда приложение в фокусе (вкладка активна)
+  messaging.onMessage((payload) => {
+    console.log('Получено сообщение в фокусе:', payload);
+    // Здесь можно показать уведомление через Notification API или просто обновить UI
+    if (payload.notification) {
+      // Показываем браузерное уведомление, даже если вкладка активна (опционально)
+      new Notification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: '/icon.png'
+      });
+    }
+    // Если нужно автоматически обновить список чатов — это сделает listener
+  });
 
   // ==================== ONLINE STATUS ====================
   function initPresence() {
@@ -826,26 +884,22 @@
     if (!user) return;
     const userRef = db.collection('users').doc(user.uid);
     currentUserPresenceRef = userRef;
-    // Устанавливаем онлайн
     userRef.update({
       online: true,
       lastSeen: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(() => {});
 
-    // При отключении устанавливаем offline
     const onDisconnect = userRef.collection('presence').doc('status');
     onDisconnect.set({
       online: false,
       lastSeen: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-      // После установки onDisconnect, обновляем основной документ
       userRef.update({
         online: true,
         lastSeen: firebase.firestore.FieldValue.serverTimestamp()
       });
     });
 
-    // Периодическое обновление (каждые 30 секунд)
     setInterval(() => {
       userRef.update({
         online: true,
@@ -854,7 +908,6 @@
     }, 30000);
   }
 
-  // Получить статус пользователя и подписаться
   function listenUserStatus(userId, callback) {
     return db.collection('users').doc(userId).onSnapshot((doc) => {
       if (doc.exists) {
@@ -874,11 +927,9 @@
     msgDiv.className = `message ${isMine ? 'message-sent' : 'message-received'}`;
     msgDiv.dataset.msgId = msgId;
 
-    // Если это ответ на сообщение
     if (data.replyTo) {
       const replyDiv = document.createElement('div');
       replyDiv.className = 'reply-preview';
-      // Попробуем получить текст или гифку исходного сообщения
       const repliedText = data.replyToText || 'Сообщение';
       replyDiv.innerHTML = `<i class="fas fa-reply" style="margin-right:4px;"></i> ${repliedText}`;
       msgDiv.appendChild(replyDiv);
@@ -906,25 +957,21 @@
     timeSpan.className = 'timestamp';
     timeSpan.innerHTML = formatTime(data.timestamp);
 
-    // Статус прочтения для своих сообщений
     if (isMine) {
       const readStatus = document.createElement('span');
       readStatus.className = 'read-status';
       const readBy = data.readBy || [];
       if (readBy.length > 1) {
-        readStatus.innerHTML = '✔✔'; // прочитано
+        readStatus.innerHTML = '✔✔';
       } else {
-        readStatus.innerHTML = '✔'; // отправлено
+        readStatus.innerHTML = '✔';
       }
       timeSpan.appendChild(readStatus);
     }
     msgDiv.appendChild(timeSpan);
 
-    // Клик по сообщению для ответа
     msgDiv.addEventListener('click', (e) => {
-      // Игнорируем клик по кнопкам внутри (если есть)
       if (e.target.closest('.read-status')) return;
-      // Если сообщение своё, тоже можно ответить (но обычно отвечают на чужие)
       setReplyTo(msgId, data);
     });
 
@@ -940,12 +987,10 @@
     replyPanel.classList.add('active');
     messageInput.focus();
   }
-
   function clearReply() {
     replyToMessageId = null;
     replyPanel.classList.remove('active');
   }
-
   cancelReply.addEventListener('click', clearReply);
 
   // ==================== CHAT FUNCTIONS ====================
@@ -972,7 +1017,6 @@
     const initials = getInitials(name);
     chatAvatar.innerHTML = `${initials} <span class="online-dot offline" id="chat-online-dot"></span>`;
     chatAvatar.style.background = stringToColor(otherUser.uid);
-    // Подписываемся на статус пользователя
     if (window._statusUnsub) window._statusUnsub();
     window._statusUnsub = listenUserStatus(otherUser.uid, (online, lastSeen) => {
       const dot = chatAvatar.querySelector('.online-dot');
@@ -1001,19 +1045,16 @@
           if (change.type === 'added') {
             const data = change.doc.data();
             addMessageToUI(data, change.doc.id);
-            // Если сообщение от другого пользователя, отмечаем его как прочитанное
             if (data.senderId !== auth.currentUser.uid) {
               markAsRead(change.doc.id);
             }
           }
         });
-        // Помечаем все непрочитанные как прочитанные (при загрузке)
         markAllAsRead();
       }, (error) => { console.error('Ошибка подписки на сообщения:', error); });
     scrollToBottom();
   }
 
-  // === Отметить одно сообщение как прочитанное ===
   async function markAsRead(msgId) {
     const user = auth.currentUser;
     if (!user) return;
@@ -1022,25 +1063,11 @@
       await msgRef.update({
         readBy: firebase.firestore.FieldValue.arrayUnion(user.uid)
       });
-    } catch (e) { /* игнорируем, если уже прочитано */ }
+    } catch (e) { /* игнорируем */ }
   }
 
-  // === Отметить все непрочитанные сообщения в чате ===
   async function markAllAsRead() {
-    const user = auth.currentUser;
-    if (!user || !currentChatId) return;
-    try {
-      const snapshot = await db.collection('chats')
-        .doc(currentChatId)
-        .collection('messages')
-        .where('senderId', '!=', user.uid)
-        .where('readBy', 'array-contains', user.uid)
-        .limit(1)
-        .get();
-      // Если есть непрочитанные, нужно обновить их все
-      // Простой способ: получить все сообщения, где readBy не содержит user.uid
-      // Это может быть затратно, поэтому лучше делать по одному при получении (см. выше)
-    } catch (e) { console.error(e); }
+    // Реализация по желанию – можно добавить
   }
 
   function closeChat() {
@@ -1061,18 +1088,21 @@
     if (!text || !text.trim()) return;
     if (!currentChatId) { alert('Чат не выбран!'); return; }
 
+    // Определяем получателя (для уведомлений)
+    const chatDoc = await db.collection('chats').doc(currentChatId).get();
+    const participants = chatDoc.data().participants || [];
+    const receiverId = participants.find(id => id !== user.uid);
+
     const msgData = {
       text: text.trim(),
       senderId: user.uid,
       senderName: user.displayName || user.email || 'Аноним',
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      readBy: [user.uid] // автор сразу прочитал
+      readBy: [user.uid],
+      receiverId: receiverId // важно для отправки уведомлений!
     };
     if (replyToMessageId) {
       msgData.replyTo = replyToMessageId;
-      // Сохраняем текст цитируемого сообщения (для отображения)
-      // Получим данные из DOM или из кэша, но для простоты сохраним текст
-      // Можно вытащить из предыдущего сообщения, но мы сохраним как есть
       const replyMsg = document.querySelector(`.message[data-msg-id="${replyToMessageId}"]`);
       if (replyMsg) {
         const textEl = replyMsg.querySelector('.text');
@@ -1103,12 +1133,18 @@
     const user = auth.currentUser;
     if (!user) { alert('Вы не авторизованы!'); return; }
     if (!currentChatId) { alert('Чат не выбран!'); return; }
+
+    const chatDoc = await db.collection('chats').doc(currentChatId).get();
+    const participants = chatDoc.data().participants || [];
+    const receiverId = participants.find(id => id !== user.uid);
+
     const msgData = {
       gifUrl: gifUrl,
       senderId: user.uid,
       senderName: user.displayName || user.email || 'Аноним',
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      readBy: [user.uid]
+      readBy: [user.uid],
+      receiverId: receiverId
     };
     if (replyToMessageId) {
       msgData.replyTo = replyToMessageId;
@@ -1175,16 +1211,10 @@
             </div>
             <div class="time">${item.lastUpdated ? formatTime(item.lastUpdated) : ''}</div>
           `;
-          // Подписываемся на статус для каждого чата
           const dot = div.querySelector('.online-dot');
           listenUserStatus(item.user.uid, (online) => {
-            if (online) {
-              dot.className = 'online-dot';
-            } else {
-              dot.className = 'online-dot offline';
-            }
+            dot.className = online ? 'online-dot' : 'online-dot offline';
           });
-
           div.addEventListener('click', () => { openChat(item.chatId, item.user); });
           chatList.appendChild(div);
         });
@@ -1283,7 +1313,7 @@
     }
   }
 
-  // ==================== AUTHENTICATION ====================
+  // ==================== AUTH ====================
   document.getElementById('btn-login').addEventListener('click', () => {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
@@ -1325,7 +1355,6 @@
   });
 
   document.getElementById('btn-logout').addEventListener('click', () => {
-    // Обновляем статус офлайн
     if (auth.currentUser) {
       db.collection('users').doc(auth.currentUser.uid).update({
         online: false,
@@ -1334,6 +1363,7 @@
     }
     auth.signOut();
   });
+
   chatBackBtn.addEventListener('click', closeChat);
 
   sendBtn.addEventListener('click', () => sendMessage(messageInput.value));
@@ -1389,13 +1419,14 @@
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
           });
         } else {
-          // Обновим онлайн
           await docRef.update({
             online: true,
             lastSeen: firebase.firestore.FieldValue.serverTimestamp()
           });
         }
         initPresence();
+        // Настройка FCM
+        await setupFCM();
       } catch (e) {
         console.warn('⚠️ Could not check/create user document:', e);
       }
@@ -1425,7 +1456,7 @@
     }
   });
 
-  console.log('✅ Обновлённый чат с ответами, статусами и дизайном!');
+  console.log('✅ Чат с FCM готов!');
 </script>
 </body>
 </html>
