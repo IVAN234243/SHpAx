@@ -8,71 +8,72 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
-    /* === RESET & GLOBAL === */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0d0d0d;
+      background: #0b0b1a;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      color: #f0f0f0;
     }
     #app {
       width: 100%;
       max-width: 480px;
       height: 100vh;
       max-height: 820px;
-      background: #121212;
+      background: #151525;
       border-radius: 28px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       position: relative;
-      color: #f0f0f0;
     }
     @media (max-width: 480px) {
       #app { max-height: 100vh; border-radius: 0; }
     }
 
-    /* === LOGIN PAGE === */
+    /* LOGIN */
     #login-page {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
       padding: 40px 28px;
-      background: #121212;
+      background: #151525;
     }
     #login-page h2 {
       text-align: center;
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 700;
       margin-bottom: 32px;
-      color: #6c5ce7;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    #login-page h2 i { margin-right: 10px; }
+    #login-page h2 i { -webkit-text-fill-color: initial; color: #f5576c; margin-right: 10px; }
     #login-page input {
       width: 100%;
       padding: 16px 18px;
       margin-bottom: 16px;
-      border: 1px solid #333;
+      border: 1px solid #2a2a40;
       border-radius: 30px;
       font-size: 16px;
-      background: #1e1e1e;
+      background: #1e1e32;
       color: #f0f0f0;
       transition: 0.2s;
     }
     #login-page input:focus {
-      border-color: #6c5ce7;
-      background: #252525;
+      border-color: #f5576c;
+      background: #252540;
       outline: none;
-      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+      box-shadow: 0 0 0 3px rgba(245,87,108,0.2);
     }
     #login-page button {
       width: 100%;
@@ -87,10 +88,10 @@
       margin-top: 6px;
     }
     #login-page button:active { transform: scale(0.97); }
-    .btn-login { background: #6c5ce7; }
-    .btn-login:hover { background: #5a4bd1; }
-    .btn-register { background: #00b894; }
-    .btn-register:hover { background: #00a381; }
+    .btn-login { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .btn-login:hover { opacity: 0.9; }
+    .btn-register { background: #2ecc71; }
+    .btn-register:hover { background: #27ae60; }
     #login-status {
       text-align: center;
       margin-top: 16px;
@@ -99,42 +100,40 @@
       color: #ff6b6b;
     }
 
-    /* === CHAT PAGE === */
+    /* CHAT PAGE */
     #chat-page {
       display: none;
       flex-direction: column;
       height: 100%;
-      background: #121212;
+      background: #151525;
     }
 
-    /* === START SCREEN === */
+    /* START SCREEN */
     #start-screen {
       display: none;
       flex-direction: column;
       height: 100%;
-      background: #121212;
+      background: #151525;
     }
     #start-screen.active { display: flex; }
 
     .chat-header {
       padding: 16px 20px;
-      background: #1e1e1e;
-      color: #f0f0f0;
+      background: #1e1e32;
+      border-bottom: 1px solid #2a2a40;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
-      border-bottom: 1px solid #2a2a2a;
     }
     .chat-header .title {
       font-size: 20px;
       font-weight: 700;
-      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .chat-header .title i {
-      color: #6c5ce7;
-      margin-right: 8px;
-    }
+    .chat-header .title i { -webkit-text-fill-color: initial; color: #f5576c; margin-right: 8px; }
     .chat-header .logout-btn {
       background: rgba(255,255,255,0.08);
       border: none;
@@ -153,8 +152,8 @@
 
     .search-area {
       padding: 12px 16px;
-      background: #1a1a1a;
-      border-bottom: 1px solid #2a2a2a;
+      background: #1a1a2e;
+      border-bottom: 1px solid #2a2a40;
     }
     .search-area input {
       width: 100%;
@@ -162,24 +161,23 @@
       border-radius: 30px;
       border: none;
       font-size: 15px;
-      background: #252525 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 16px center;
+      background: #252540 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 16px center;
       background-size: 18px;
       color: #f0f0f0;
       outline: none;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
       transition: 0.2s;
     }
     .search-area input:focus {
-      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.25);
-      background-color: #2a2a2a;
+      box-shadow: 0 0 0 3px rgba(245,87,108,0.2);
+      background-color: #2e2e4a;
     }
 
     .search-results {
       max-height: 220px;
       overflow-y: auto;
       padding: 8px 0;
-      background: #1a1a1a;
-      border-bottom: 1px solid #2a2a2a;
+      background: #1a1a2e;
+      border-bottom: 1px solid #2a2a40;
       display: none;
     }
     .search-results.active { display: block; }
@@ -188,10 +186,10 @@
       align-items: center;
       padding: 12px 20px;
       cursor: pointer;
-      border-bottom: 1px solid #252525;
+      border-bottom: 1px solid #252540;
       transition: 0.1s;
     }
-    .search-result-item:active { background: #252525; }
+    .search-result-item:active { background: #252540; }
     .search-result-item .avatar {
       width: 40px;
       height: 40px;
@@ -204,27 +202,27 @@
       margin-right: 14px;
       flex-shrink: 0;
       color: #fff;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
     }
     .search-result-item .info { flex: 1; }
     .search-result-item .name { font-weight: 600; color: #f0f0f0; }
     .search-result-item .email { font-size: 14px; color: #888; }
 
-    /* === CHAT LIST === */
+    /* CHAT LIST */
     .chat-list {
       flex: 1;
       overflow-y: auto;
-      background: #121212;
+      background: #151525;
     }
     .chat-list-item {
       display: flex;
       align-items: center;
       padding: 14px 20px;
-      border-bottom: 1px solid #1e1e1e;
+      border-bottom: 1px solid #1e1e32;
       cursor: pointer;
       transition: 0.1s;
-      position: relative;
     }
-    .chat-list-item:active { background: #1e1e1e; }
+    .chat-list-item:active { background: #1e1e32; }
     .chat-list-item .avatar {
       width: 48px;
       height: 48px;
@@ -237,6 +235,7 @@
       font-size: 18px;
       margin-right: 14px;
       flex-shrink: 0;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
       position: relative;
     }
     .chat-list-item .avatar .online-dot {
@@ -246,8 +245,8 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: #00b894;
-      border: 2px solid #121212;
+      background: #2ecc71;
+      border: 2px solid #151525;
     }
     .chat-list-item .avatar .online-dot.offline {
       background: #636e72;
@@ -284,27 +283,27 @@
     .chat-list-empty i {
       display: block;
       font-size: 48px;
-      color: #2d2d2d;
+      color: #2d2d4a;
       margin-bottom: 16px;
     }
 
-    /* === CHAT SCREEN === */
+    /* CHAT SCREEN */
     #chat-screen {
       display: none;
       flex-direction: column;
       height: 100%;
-      background: #0d0d0d;
+      background: #0d0d1a;
       position: relative;
     }
     #chat-screen.active { display: flex; }
 
     #chat-screen .chat-header {
-      background: #1e1e1e;
+      background: #1e1e32;
       padding: 10px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      border-bottom: 1px solid #2a2a2a;
+      border-bottom: 1px solid #2a2a40;
     }
     #chat-screen .chat-header .back-btn {
       background: none;
@@ -313,7 +312,6 @@
       font-size: 20px;
       cursor: pointer;
       padding: 4px 8px;
-      transition: 0.2s;
     }
     #chat-screen .chat-header .back-btn:hover { opacity: 0.7; }
     #chat-screen .chat-header .chat-info {
@@ -333,6 +331,7 @@
       font-weight: 700;
       font-size: 16px;
       flex-shrink: 0;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
       position: relative;
     }
     #chat-screen .chat-header .chat-info .avatar .online-dot {
@@ -342,8 +341,8 @@
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: #00b894;
-      border: 2px solid #1e1e1e;
+      background: #2ecc71;
+      border: 2px solid #1e1e32;
     }
     #chat-screen .chat-header .chat-info .avatar .online-dot.offline {
       background: #636e72;
@@ -351,9 +350,6 @@
     #chat-screen .chat-header .chat-info .title {
       font-size: 18px;
       font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       color: #f0f0f0;
     }
     #chat-screen .chat-header .chat-info .subtitle {
@@ -374,16 +370,16 @@
     }
     #chat-screen .chat-header .chat-actions i:hover { color: #fff; }
 
-    /* === MESSAGES AREA === */
+    /* MESSAGES AREA */
     .messages-area {
       flex: 1;
       overflow-y: auto;
       padding: 16px 18px 12px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      background: #0d0d0d;
-      background-image: radial-gradient(circle at 20% 30%, rgba(108,92,231,0.02) 0%, transparent 30%);
+      gap: 6px;
+      background: #0d0d1a;
+      background-image: radial-gradient(circle at 20% 30%, rgba(245,87,108,0.03) 0%, transparent 40%);
     }
     .message {
       max-width: 82%;
@@ -398,17 +394,17 @@
       margin-bottom: 2px;
     }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .message-sent {
-      background: #6c5ce7;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
       color: #fff;
       align-self: flex-end;
       border-bottom-right-radius: 6px;
     }
     .message-received {
-      background: #2d2d2d;
+      background: #2a2a40;
       color: #f0f0f0;
       align-self: flex-start;
       border-bottom-left-radius: 6px;
@@ -416,18 +412,20 @@
     .message .sender {
       font-size: 11px;
       font-weight: 600;
-      color: #b8a9f0;
+      color: rgba(255,255,255,0.7);
       margin-bottom: 2px;
       display: block;
     }
-    .message-sent .sender { color: #d4ccf0; }
+    .message-sent .sender { color: rgba(255,255,255,0.8); }
     .message .text { margin: 0; }
-    .message .gif-image {
-      max-width: 180px;
+    .message .media {
+      max-width: 100%;
       border-radius: 12px;
       margin-top: 4px;
       display: block;
     }
+    .message .media.audio { width: 100%; }
+    .message .media.video { max-height: 300px; }
     .message .timestamp {
       font-size: 10px;
       color: rgba(255,255,255,0.5);
@@ -444,25 +442,25 @@
       margin-left: 4px;
     }
     .message .reply-preview {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.08);
       padding: 6px 10px;
       border-radius: 8px;
       font-size: 13px;
       color: #aaa;
       margin-bottom: 4px;
-      border-left: 3px solid #6c5ce7;
+      border-left: 3px solid #f5576c;
     }
     .message-sent .reply-preview {
-      background: rgba(255,255,255,0.1);
-      border-left-color: #b8a9f0;
+      background: rgba(255,255,255,0.15);
+      border-left-color: #f093fb;
     }
 
-    /* === REPLY PANEL === */
+    /* REPLY PANEL */
     .reply-panel {
       display: none;
-      background: #1e1e1e;
+      background: #1e1e32;
       padding: 8px 16px;
-      border-top: 1px solid #2a2a2a;
+      border-top: 1px solid #2a2a40;
       align-items: center;
       gap: 12px;
       flex-shrink: 0;
@@ -486,16 +484,28 @@
       padding: 0 8px;
     }
 
-    /* === INPUT AREA === */
+    /* INPUT AREA */
     .input-area {
-      background: #1a1a1a;
-      border-top: 1px solid #2a2a2a;
+      background: #1a1a2e;
+      border-top: 1px solid #2a2a40;
       padding: 8px 12px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       align-items: flex-end;
       flex-shrink: 0;
+      flex-wrap: wrap;
     }
+    .input-area .attach-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      padding: 6px 4px;
+      cursor: pointer;
+      color: #f5576c;
+      transition: 0.2s;
+    }
+    .input-area .attach-btn:active { transform: scale(0.85); }
     .input-area .gif-btn {
       background: none;
       border: none;
@@ -503,8 +513,7 @@
       line-height: 1;
       padding: 6px 4px;
       cursor: pointer;
-      color: #6c5ce7;
-      transition: 0.2s;
+      color: #f093fb;
     }
     .input-area .gif-btn:active { transform: scale(0.85); }
     .input-area textarea {
@@ -518,17 +527,16 @@
       min-height: 40px;
       max-height: 100px;
       font-family: inherit;
-      background: #252525;
+      background: #252540;
       color: #f0f0f0;
-      box-shadow: inset 0 1px 4px rgba(0,0,0,0.2);
       transition: 0.2s;
     }
     .input-area textarea:focus {
-      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
-      background: #2a2a2a;
+      box-shadow: 0 0 0 3px rgba(245,87,108,0.2);
+      background: #2e2e4a;
     }
     .input-area .send-btn {
-      background: #6c5ce7;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
       border: none;
       color: white;
       font-size: 18px;
@@ -544,12 +552,12 @@
     }
     .input-area .send-btn:active { transform: scale(0.92); }
 
-    /* === SCROLL DOWN === */
+    /* SCROLL DOWN */
     .scroll-down-btn {
       position: absolute;
       bottom: 80px;
       right: 16px;
-      background: #6c5ce7;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
       color: white;
       border: none;
       border-radius: 50%;
@@ -557,16 +565,15 @@
       height: 44px;
       font-size: 18px;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(108,92,231,0.4);
+      box-shadow: 0 4px 16px rgba(245,87,108,0.4);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 10;
-      transition: 0.2s;
     }
     .scroll-down-btn:active { transform: scale(0.92); }
 
-    /* === GIF POPUP === */
+    /* GIF POPUP */
     .gif-popup {
       display: none;
       position: absolute;
@@ -582,7 +589,7 @@
     }
     .gif-popup.active { display: flex; }
     .gif-popup-content {
-      background: #1e1e1e;
+      background: #1e1e32;
       border-radius: 28px;
       width: 90%;
       max-width: 400px;
@@ -591,7 +598,6 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
     }
     .gif-popup-content .header {
       display: flex;
@@ -605,7 +611,7 @@
       color: #f0f0f0;
       margin: 0;
     }
-    .gif-popup-content .header h3 i { color: #6c5ce7; margin-right: 8px; }
+    .gif-popup-content .header h3 i { color: #f5576c; margin-right: 8px; }
     .gif-popup-content .header .close-btn {
       background: none;
       border: none;
@@ -618,18 +624,18 @@
       width: 100%;
       padding: 12px 16px;
       border-radius: 30px;
-      border: 1px solid #333;
+      border: 1px solid #2a2a40;
       font-size: 15px;
       outline: none;
       margin-bottom: 14px;
-      background: #252525;
+      background: #252540;
       color: #f0f0f0;
       transition: 0.2s;
     }
     .gif-popup-content input:focus {
-      border-color: #6c5ce7;
-      background: #2a2a2a;
-      box-shadow: 0 0 0 3px rgba(108,92,231,0.2);
+      border-color: #f5576c;
+      background: #2e2e4a;
+      box-shadow: 0 0 0 3px rgba(245,87,108,0.2);
     }
     .gif-grid {
       display: flex;
@@ -651,8 +657,8 @@
     }
     .gif-grid img:hover {
       transform: scale(1.03);
-      border-color: #6c5ce7;
-      box-shadow: 0 4px 12px rgba(108,92,231,0.3);
+      border-color: #f5576c;
+      box-shadow: 0 4px 12px rgba(245,87,108,0.3);
     }
     .gif-grid .placeholder {
       color: #636e72;
@@ -667,21 +673,26 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+    /* HIDDEN FILE INPUT */
+    #file-input {
+      display: none;
+    }
   </style>
 </head>
 <body>
 <div id="app">
-  <!-- Страница входа -->
+  <!-- Login -->
   <div id="login-page">
     <h2><i class="fas fa-comment-dots"></i> Чат</h2>
     <input type="email" id="login-email" placeholder="Email" value="test@mail.com">
     <input type="password" id="login-password" placeholder="Пароль" value="123456">
     <button class="btn-login" id="btn-login"><i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>Войти</button>
-    <button class="btn-register" id="btn-register"><i class="fas fa-user-plus" style="margin-right:8px;"></i>Создать аккаунт</button>
+    <button class="btn-register" id="btn-register"><i class="fas fa-user-plus" style="margin-right:8px;"></i>Создать</button>
     <div id="login-status"></div>
   </div>
 
-  <!-- Основной интерфейс чата -->
+  <!-- Chat -->
   <div id="chat-page">
     <div id="start-screen">
       <div class="chat-header">
@@ -721,13 +732,14 @@
       <div class="messages-area" id="messages-area"></div>
       <button class="scroll-down-btn" id="scroll-down-btn"><i class="fas fa-chevron-down"></i></button>
 
-      <!-- Панель ответа -->
+      <!-- Reply panel -->
       <div class="reply-panel" id="reply-panel">
         <div class="reply-content" id="reply-content">Ответ на <strong>сообщение</strong></div>
         <button class="cancel-reply" id="cancel-reply"><i class="fas fa-times"></i></button>
       </div>
 
       <div class="input-area">
+        <button class="attach-btn" id="attach-btn"><i class="fas fa-paperclip"></i></button>
         <button class="gif-btn" id="gif-btn"><i class="fas fa-image"></i></button>
         <textarea id="message-input" placeholder="Сообщение..." rows="1"></textarea>
         <button class="send-btn" id="send-btn"><i class="fas fa-paper-plane"></i></button>
@@ -735,7 +747,7 @@
     </div>
   </div>
 
-  <!-- Попап для гифок -->
+  <!-- GIF popup -->
   <div class="gif-popup" id="gif-popup">
     <div class="gif-popup-content">
       <div class="header">
@@ -746,6 +758,9 @@
       <div class="gif-grid" id="gif-grid"><div class="placeholder">Введите запрос</div></div>
     </div>
   </div>
+
+  <!-- Скрытый input для выбора файлов -->
+  <input type="file" id="file-input" accept="image/*,video/*,audio/*">
 </div>
 
 <script>
@@ -760,10 +775,10 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
-  const messaging = firebase.messaging();
+  const storage = firebase.storage();
   const GIPHY_API_KEY = 'HnlRtWo9NXAw0vw8a9ZsqrDLuTAAHPfW';
 
-  // ==================== DOM ELEMENTS ====================
+  // ==================== DOM ====================
   const loginPage = document.getElementById('login-page');
   const chatPage = document.getElementById('chat-page');
   const startScreen = document.getElementById('start-screen');
@@ -789,6 +804,8 @@
   const replyPanel = document.getElementById('reply-panel');
   const replyContent = document.getElementById('reply-content');
   const cancelReply = document.getElementById('cancel-reply');
+  const attachBtn = document.getElementById('attach-btn');
+  const fileInput = document.getElementById('file-input');
 
   // ==================== VARIABLES ====================
   let currentChatId = null;
@@ -798,7 +815,6 @@
   let searchTimeout = null;
   let replyToMessageId = null;
   let currentUserPresenceRef = null;
-  let fcmToken = null;
 
   // ==================== HELPERS ====================
   function getInitials(name) {
@@ -818,65 +834,6 @@
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
   function scrollToBottom() { messagesArea.scrollTop = messagesArea.scrollHeight; }
-
-  // ==================== FCM (PUSH) ====================
-  const VAPID_KEY = 'BH6j9az77e4v_Cki4DZvaJZ5Lap-B8aJ4NDly2Fx8yq_e6oo8Q5_qBps1YLEyttWetuzuz03CARihF8n9HQVVDE';
-
-  async function setupFCM() {
-    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-      console.warn('Push не поддерживается');
-      return;
-    }
-    try {
-      // Регистрируем Service Worker
-      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-      console.log('Service Worker зарегистрирован');
-      await messaging.useServiceWorker(registration);
-
-      // Проверяем разрешение
-      if (Notification.permission === 'granted') {
-        await updateFCMToken();
-      } else if (Notification.permission === 'default') {
-        const result = await Notification.requestPermission();
-        if (result === 'granted') {
-          await updateFCMToken();
-        }
-      }
-    } catch (err) {
-      console.error('Ошибка регистрации FCM:', err);
-    }
-  }
-
-  async function updateFCMToken() {
-    try {
-      const token = await messaging.getToken({ vapidKey: VAPID_KEY });
-      console.log('FCM Token:', token);
-      const user = auth.currentUser;
-      if (user) {
-        await db.collection('users').doc(user.uid).update({
-          fcmToken: token,
-          fcmTokenUpdated: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        fcmToken = token;
-      }
-    } catch (err) {
-      console.error('Ошибка получения токена:', err);
-    }
-  }
-
-  // Обработка сообщений, когда приложение в фокусе (вкладка активна)
-  messaging.onMessage((payload) => {
-    console.log('Получено сообщение в фокусе:', payload);
-    // Здесь можно показать уведомление через Notification API или просто обновить UI
-    if (payload.notification) {
-      // Показываем браузерное уведомление, даже если вкладка активна (опционально)
-      new Notification(payload.notification.title, {
-        body: payload.notification.body,
-        icon: '/icon.png'
-      });
-    }
-    // Если нужно автоматически обновить список чатов — это сделает listener
-  });
 
   // ==================== ONLINE STATUS ====================
   function initPresence() {
@@ -912,12 +869,12 @@
     return db.collection('users').doc(userId).onSnapshot((doc) => {
       if (doc.exists) {
         const data = doc.data();
-        callback(data.online, data.lastSeen);
+        callback(data.online || false, data.lastSeen);
       }
     });
   }
 
-  // ==================== UI: ADD MESSAGE ====================
+  // ==================== ADD MESSAGE TO UI ====================
   function addMessageToUI(data, msgId) {
     const currentUser = auth.currentUser;
     if (!currentUser) return;
@@ -927,6 +884,7 @@
     msgDiv.className = `message ${isMine ? 'message-sent' : 'message-received'}`;
     msgDiv.dataset.msgId = msgId;
 
+    // Reply preview
     if (data.replyTo) {
       const replyDiv = document.createElement('div');
       replyDiv.className = 'reply-preview';
@@ -935,24 +893,56 @@
       msgDiv.appendChild(replyDiv);
     }
 
+    // Sender name
     const senderSpan = document.createElement('span');
     senderSpan.className = 'sender';
     senderSpan.textContent = senderName;
     msgDiv.appendChild(senderSpan);
 
+    // Text
     if (data.text) {
       const textP = document.createElement('div');
       textP.className = 'text';
       textP.textContent = data.text;
       msgDiv.appendChild(textP);
-    } else if (data.gifUrl) {
+    }
+
+    // Media
+    if (data.mediaUrl) {
+      const mediaEl = document.createElement('div');
+      if (data.mediaType === 'image') {
+        const img = document.createElement('img');
+        img.src = data.mediaUrl;
+        img.className = 'media';
+        img.alt = 'Изображение';
+        mediaEl.appendChild(img);
+      } else if (data.mediaType === 'video') {
+        const video = document.createElement('video');
+        video.src = data.mediaUrl;
+        video.className = 'media video';
+        video.controls = true;
+        video.preload = 'metadata';
+        mediaEl.appendChild(video);
+      } else if (data.mediaType === 'audio') {
+        const audio = document.createElement('audio');
+        audio.src = data.mediaUrl;
+        audio.className = 'media audio';
+        audio.controls = true;
+        mediaEl.appendChild(audio);
+      }
+      msgDiv.appendChild(mediaEl);
+    }
+
+    // GIF
+    if (data.gifUrl) {
       const img = document.createElement('img');
-      img.className = 'gif-image';
+      img.className = 'media';
       img.src = data.gifUrl;
       img.alt = 'GIF';
       msgDiv.appendChild(img);
     }
 
+    // Timestamp + read status
     const timeSpan = document.createElement('div');
     timeSpan.className = 'timestamp';
     timeSpan.innerHTML = formatTime(data.timestamp);
@@ -970,6 +960,7 @@
     }
     msgDiv.appendChild(timeSpan);
 
+    // Click to reply
     msgDiv.addEventListener('click', (e) => {
       if (e.target.closest('.read-status')) return;
       setReplyTo(msgId, data);
@@ -979,10 +970,10 @@
     scrollToBottom();
   }
 
-  // ==================== ОТВЕТЫ ====================
+  // ==================== REPLY ====================
   function setReplyTo(msgId, msgData) {
     replyToMessageId = msgId;
-    const text = msgData.text || (msgData.gifUrl ? 'GIF' : 'Сообщение');
+    const text = msgData.text || (msgData.gifUrl ? 'GIF' : (msgData.mediaType || 'Медиа'));
     replyContent.innerHTML = `Ответ на <strong>${text}</strong>`;
     replyPanel.classList.add('active');
     messageInput.focus();
@@ -1045,11 +1036,17 @@
           if (change.type === 'added') {
             const data = change.doc.data();
             addMessageToUI(data, change.doc.id);
+            // Если сообщение не от нас, отмечаем прочитанным
             if (data.senderId !== auth.currentUser.uid) {
               markAsRead(change.doc.id);
             }
+            // Браузерное уведомление, если мы не в этом чате (или свёрнуто)
+            if (data.senderId !== auth.currentUser.uid && currentChatId !== chatId) {
+              showBrowserNotification(data);
+            }
           }
         });
+        // Помечаем все непрочитанные как прочитанные (если нужно)
         markAllAsRead();
       }, (error) => { console.error('Ошибка подписки на сообщения:', error); });
     scrollToBottom();
@@ -1063,11 +1060,11 @@
       await msgRef.update({
         readBy: firebase.firestore.FieldValue.arrayUnion(user.uid)
       });
-    } catch (e) { /* игнорируем */ }
+    } catch (e) { /* ignore */ }
   }
 
   async function markAllAsRead() {
-    // Реализация по желанию – можно добавить
+    // Можно реализовать массовую отметку, но для простоты оставим как есть
   }
 
   function closeChat() {
@@ -1081,6 +1078,27 @@
     clearReply();
   }
 
+  // ==================== BROWSER NOTIFICATIONS ====================
+  function showBrowserNotification(data) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const senderName = data.senderName || 'Кто-то';
+    let body = data.text || 'Новое сообщение';
+    if (data.gifUrl) body = '🖼️ GIF';
+    if (data.mediaUrl) body = `📎 ${data.mediaType || 'Файл'}`;
+    const notification = new Notification(senderName, {
+      body: body,
+      icon: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="%23f5576c"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>'
+    });
+    setTimeout(() => notification.close(), 5000);
+  }
+
+  // Запрос разрешения на уведомления при входе
+  function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
   // ==================== SEND MESSAGE ====================
   async function sendMessage(text) {
     const user = auth.currentUser;
@@ -1088,7 +1106,6 @@
     if (!text || !text.trim()) return;
     if (!currentChatId) { alert('Чат не выбран!'); return; }
 
-    // Определяем получателя (для уведомлений)
     const chatDoc = await db.collection('chats').doc(currentChatId).get();
     const participants = chatDoc.data().participants || [];
     const receiverId = participants.find(id => id !== user.uid);
@@ -1099,7 +1116,7 @@
       senderName: user.displayName || user.email || 'Аноним',
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
       readBy: [user.uid],
-      receiverId: receiverId // важно для отправки уведомлений!
+      receiverId: receiverId
     };
     if (replyToMessageId) {
       msgData.replyTo = replyToMessageId;
@@ -1108,8 +1125,9 @@
         const textEl = replyMsg.querySelector('.text');
         if (textEl) msgData.replyToText = textEl.textContent;
         else {
-          const gifEl = replyMsg.querySelector('.gif-image');
-          if (gifEl) msgData.replyToText = 'GIF';
+          const gifEl = replyMsg.querySelector('.media[src]');
+          if (gifEl && gifEl.src && gifEl.src.includes('giphy')) msgData.replyToText = 'GIF';
+          else if (gifEl) msgData.replyToText = 'Медиа';
           else msgData.replyToText = 'Сообщение';
         }
       } else {
@@ -1119,7 +1137,7 @@
     }
 
     try {
-      const docRef = await db.collection('chats').doc(currentChatId).collection('messages').add(msgData);
+      await db.collection('chats').doc(currentChatId).collection('messages').add(msgData);
       await db.collection('chats').doc(currentChatId).update({
         lastMessage: text.trim(),
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -1129,6 +1147,57 @@
     } catch (e) { alert('Ошибка отправки: ' + e.message); }
   }
 
+  // ==================== SEND MEDIA ====================
+  async function sendMedia(file) {
+    const user = auth.currentUser;
+    if (!user) { alert('Вы не авторизованы!'); return; }
+    if (!currentChatId) { alert('Чат не выбран!'); return; }
+
+    // Определяем тип
+    let mediaType = '';
+    if (file.type.startsWith('image/')) mediaType = 'image';
+    else if (file.type.startsWith('video/')) mediaType = 'video';
+    else if (file.type.startsWith('audio/')) mediaType = 'audio';
+    else { alert('Неподдерживаемый формат'); return; }
+
+    // Загружаем в Storage
+    const path = `chat_media/${currentChatId}/${Date.now()}_${file.name}`;
+    const ref = storage.ref().child(path);
+    try {
+      const snapshot = await ref.put(file);
+      const downloadURL = await snapshot.ref.getDownloadURL();
+
+      // Отправляем сообщение с медиа
+      const chatDoc = await db.collection('chats').doc(currentChatId).get();
+      const participants = chatDoc.data().participants || [];
+      const receiverId = participants.find(id => id !== user.uid);
+
+      const msgData = {
+        mediaUrl: downloadURL,
+        mediaType: mediaType,
+        senderId: user.uid,
+        senderName: user.displayName || user.email || 'Аноним',
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        readBy: [user.uid],
+        receiverId: receiverId
+      };
+      if (replyToMessageId) {
+        msgData.replyTo = replyToMessageId;
+        msgData.replyToText = 'Медиа';
+        clearReply();
+      }
+
+      await db.collection('chats').doc(currentChatId).collection('messages').add(msgData);
+      await db.collection('chats').doc(currentChatId).update({
+        lastMessage: `📎 ${mediaType}`,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (e) {
+      alert('Ошибка загрузки файла: ' + e.message);
+    }
+  }
+
+  // ==================== SEND GIF ====================
   async function sendGifMessage(gifUrl) {
     const user = auth.currentUser;
     if (!user) { alert('Вы не авторизованы!'); return; }
@@ -1320,7 +1389,8 @@
     auth.signInWithEmailAndPassword(email, password)
       .then(() => {
         statusEl.textContent = '✅ Вход выполнен';
-        statusEl.style.color = '#00b894';
+        statusEl.style.color = '#2ecc71';
+        requestNotificationPermission();
       })
       .catch(e => {
         statusEl.textContent = '❌ ' + e.message;
@@ -1346,7 +1416,7 @@
         lastSeen: firebase.firestore.FieldValue.serverTimestamp()
       });
       statusEl.textContent = '✅ Аккаунт создан!';
-      statusEl.style.color = '#00b894';
+      statusEl.style.color = '#2ecc71';
     } catch (e) {
       console.error('❌ Registration error:', e);
       statusEl.textContent = '❌ ' + e.message;
@@ -1404,6 +1474,15 @@
     searchTimeout = setTimeout(() => searchGifs(query), 400);
   });
 
+  // Прикрепление файла
+  attachBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      sendMedia(e.target.files[0]);
+      fileInput.value = ''; // сброс
+    }
+  });
+
   // ==================== ON AUTH STATE CHANGED ====================
   auth.onAuthStateChanged(async (user) => {
     if (user) {
@@ -1425,8 +1504,7 @@
           });
         }
         initPresence();
-        // Настройка FCM
-        await setupFCM();
+        requestNotificationPermission();
       } catch (e) {
         console.warn('⚠️ Could not check/create user document:', e);
       }
@@ -1456,7 +1534,7 @@
     }
   });
 
-  console.log('✅ Чат с FCM готов!');
+  console.log('✅ Чат с медиа и исправлениями готов!');
 </script>
 </body>
 </html>
