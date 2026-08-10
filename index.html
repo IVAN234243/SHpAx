@@ -14,26 +14,26 @@
     /* === RESET & GLOBAL === */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #e5e5ea;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d0d0d;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 0;
     }
     #app {
       width: 100%;
       max-width: 480px;
       height: 100vh;
-      max-height: 800px;
-      background: #ffffff;
+      max-height: 820px;
+      background: #121212;
       border-radius: 28px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       position: relative;
+      color: #f0f0f0;
     }
     @media (max-width: 480px) {
       #app { max-height: 100vh; border-radius: 0; }
@@ -46,34 +46,32 @@
       flex-direction: column;
       justify-content: center;
       padding: 40px 28px;
-      background: #ffffff;
+      background: #121212;
     }
     #login-page h2 {
       text-align: center;
       font-size: 30px;
       font-weight: 700;
       margin-bottom: 32px;
-      color: #075e54;
+      color: #6c5ce7;
     }
-    #login-page h2 i {
-      color: #25d366;
-      margin-right: 8px;
-    }
+    #login-page h2 i { margin-right: 10px; }
     #login-page input {
       width: 100%;
       padding: 16px 18px;
       margin-bottom: 16px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid #333;
       border-radius: 30px;
       font-size: 16px;
-      background: #f5f5f5;
+      background: #1e1e1e;
+      color: #f0f0f0;
       transition: 0.2s;
     }
     #login-page input:focus {
-      border-color: #25d366;
-      background: #fff;
+      border-color: #6c5ce7;
+      background: #252525;
       outline: none;
-      box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15);
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
     }
     #login-page button {
       width: 100%;
@@ -88,16 +86,16 @@
       margin-top: 6px;
     }
     #login-page button:active { transform: scale(0.97); }
-    .btn-login { background: #075e54; }
-    .btn-login:hover { background: #054b44; }
-    .btn-register { background: #25d366; }
-    .btn-register:hover { background: #1da85c; }
+    .btn-login { background: #6c5ce7; }
+    .btn-login:hover { background: #5a4bd1; }
+    .btn-register { background: #00b894; }
+    .btn-register:hover { background: #00a381; }
     #login-status {
       text-align: center;
       margin-top: 16px;
       font-size: 14px;
       min-height: 20px;
-      color: #ff3b30;
+      color: #ff6b6b;
     }
 
     /* === CHAT PAGE === */
@@ -105,7 +103,7 @@
       display: none;
       flex-direction: column;
       height: 100%;
-      background: #ededed;
+      background: #121212;
     }
 
     /* === START SCREEN (список чатов) === */
@@ -113,19 +111,19 @@
       display: none;
       flex-direction: column;
       height: 100%;
-      background: #ffffff;
+      background: #121212;
     }
     #start-screen.active { display: flex; }
 
     .chat-header {
       padding: 16px 20px;
-      background: #075e54;
-      color: white;
+      background: #1e1e1e;
+      color: #f0f0f0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid #2a2a2a;
     }
     .chat-header .title {
       font-size: 20px;
@@ -133,12 +131,13 @@
       letter-spacing: -0.3px;
     }
     .chat-header .title i {
+      color: #6c5ce7;
       margin-right: 8px;
     }
     .chat-header .logout-btn {
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
       border: none;
-      color: white;
+      color: #f0f0f0;
       font-size: 15px;
       font-weight: 600;
       padding: 6px 14px;
@@ -149,14 +148,12 @@
       align-items: center;
       gap: 6px;
     }
-    .chat-header .logout-btn:hover {
-      background: rgba(255,255,255,0.25);
-    }
+    .chat-header .logout-btn:hover { background: rgba(255,255,255,0.15); }
 
     .search-area {
       padding: 12px 16px;
-      background: #f8f9fa;
-      border-bottom: 1px solid #e9ecef;
+      background: #1a1a1a;
+      border-bottom: 1px solid #2a2a2a;
     }
     .search-area input {
       width: 100%;
@@ -164,23 +161,24 @@
       border-radius: 30px;
       border: none;
       font-size: 15px;
-      background: #ffffff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 16px center;
+      background: #252525 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%23888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>') no-repeat 16px center;
       background-size: 18px;
+      color: #f0f0f0;
       outline: none;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
       transition: 0.2s;
     }
     .search-area input:focus {
-      box-shadow: 0 0 0 3px rgba(7, 94, 84, 0.15);
-      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.25);
+      background-color: #2a2a2a;
     }
 
     .search-results {
       max-height: 220px;
       overflow-y: auto;
       padding: 8px 0;
-      background: #fff;
-      border-bottom: 1px solid #e9ecef;
+      background: #1a1a1a;
+      border-bottom: 1px solid #2a2a2a;
       display: none;
     }
     .search-results.active { display: block; }
@@ -189,16 +187,14 @@
       align-items: center;
       padding: 12px 20px;
       cursor: pointer;
-      border-bottom: 1px solid #f1f3f5;
+      border-bottom: 1px solid #252525;
       transition: 0.1s;
     }
-    .search-result-item:active { background: #f1f3f5; }
+    .search-result-item:active { background: #252525; }
     .search-result-item .avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #25d366;
-      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -206,26 +202,28 @@
       font-size: 16px;
       margin-right: 14px;
       flex-shrink: 0;
+      color: #fff;
     }
     .search-result-item .info { flex: 1; }
-    .search-result-item .name { font-weight: 600; color: #1c1c1e; }
-    .search-result-item .email { font-size: 14px; color: #8e8e93; }
+    .search-result-item .name { font-weight: 600; color: #f0f0f0; }
+    .search-result-item .email { font-size: 14px; color: #888; }
 
     /* === CHAT LIST === */
     .chat-list {
       flex: 1;
       overflow-y: auto;
-      background: #fff;
+      background: #121212;
     }
     .chat-list-item {
       display: flex;
       align-items: center;
       padding: 14px 20px;
-      border-bottom: 1px solid #f1f3f5;
+      border-bottom: 1px solid #1e1e1e;
       cursor: pointer;
       transition: 0.1s;
+      position: relative;
     }
-    .chat-list-item:active { background: #f1f3f5; }
+    .chat-list-item:active { background: #1e1e1e; }
     .chat-list-item .avatar {
       width: 48px;
       height: 48px;
@@ -238,6 +236,20 @@
       font-size: 18px;
       margin-right: 14px;
       flex-shrink: 0;
+      position: relative;
+    }
+    .chat-list-item .avatar .online-dot {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #00b894;
+      border: 2px solid #121212;
+    }
+    .chat-list-item .avatar .online-dot.offline {
+      background: #636e72;
     }
     .chat-list-item .info {
       flex: 1;
@@ -245,12 +257,12 @@
     }
     .chat-list-item .info .name {
       font-weight: 600;
-      color: #1c1c1e;
+      color: #f0f0f0;
       font-size: 16px;
     }
     .chat-list-item .info .last-msg {
       font-size: 14px;
-      color: #8e8e93;
+      color: #888;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -258,46 +270,45 @@
     }
     .chat-list-item .time {
       font-size: 12px;
-      color: #8e8e93;
+      color: #636e72;
       flex-shrink: 0;
       margin-left: 12px;
     }
     .chat-list-empty {
       text-align: center;
-      color: #8e8e93;
+      color: #636e72;
       padding: 60px 20px;
       font-size: 16px;
     }
     .chat-list-empty i {
       display: block;
       font-size: 48px;
-      color: #d1d1d6;
+      color: #2d2d2d;
       margin-bottom: 16px;
     }
 
-    /* === CHAT SCREEN (окно переписки) === */
+    /* === CHAT SCREEN === */
     #chat-screen {
       display: none;
       flex-direction: column;
       height: 100%;
-      background: #e5ddd5;
+      background: #0d0d0d;
       position: relative;
     }
     #chat-screen.active { display: flex; }
 
     #chat-screen .chat-header {
-      background: #075e54;
-      color: white;
+      background: #1e1e1e;
       padding: 10px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid #2a2a2a;
     }
     #chat-screen .chat-header .back-btn {
       background: none;
       border: none;
-      color: white;
+      color: #f0f0f0;
       font-size: 20px;
       cursor: pointer;
       padding: 4px 8px;
@@ -321,27 +332,46 @@
       font-weight: 700;
       font-size: 16px;
       flex-shrink: 0;
-      background: #25d366;
+      position: relative;
+    }
+    #chat-screen .chat-header .chat-info .avatar .online-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #00b894;
+      border: 2px solid #1e1e1e;
+    }
+    #chat-screen .chat-header .chat-info .avatar .online-dot.offline {
+      background: #636e72;
     }
     #chat-screen .chat-header .chat-info .title {
       font-size: 18px;
       font-weight: 600;
-      letter-spacing: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: #f0f0f0;
+    }
+    #chat-screen .chat-header .chat-info .subtitle {
+      font-size: 12px;
+      color: #888;
+      display: block;
+      margin-top: 2px;
     }
     #chat-screen .chat-header .chat-actions {
       display: flex;
-      gap: 12px;
+      gap: 14px;
+      color: #aaa;
     }
     #chat-screen .chat-header .chat-actions i {
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
-      opacity: 0.8;
       transition: 0.2s;
     }
-    #chat-screen .chat-header .chat-actions i:hover { opacity: 1; }
+    #chat-screen .chat-header .chat-actions i:hover { color: #fff; }
 
     /* === MESSAGES AREA === */
     .messages-area {
@@ -351,9 +381,8 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      background: #e5ddd5;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" opacity="0.04"><rect width="100" height="100" fill="none"/><circle cx="20" cy="20" r="2" fill="%23000"/><circle cx="70" cy="10" r="1.5" fill="%23000"/><circle cx="45" cy="80" r="2.5" fill="%23000"/><circle cx="90" cy="70" r="1.8" fill="%23000"/><circle cx="10" cy="85" r="1.2" fill="%23000"/></svg>');
-      background-size: 200px 200px;
+      background: #0d0d0d;
+      background-image: radial-gradient(circle at 20% 30%, rgba(108,92,231,0.02) 0%, transparent 30%);
     }
     .message {
       max-width: 82%;
@@ -362,34 +391,35 @@
       font-size: 15px;
       line-height: 1.45;
       word-wrap: break-word;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-      animation: fadeUp 0.25s ease-out;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      animation: fadeUp 0.2s ease-out;
       position: relative;
       margin-bottom: 2px;
     }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .message-sent {
-      background: #d9fdd3;
+      background: #6c5ce7;
+      color: #fff;
       align-self: flex-end;
       border-bottom-right-radius: 6px;
-      background: #dcf8c6;
     }
     .message-received {
-      background: white;
+      background: #2d2d2d;
+      color: #f0f0f0;
       align-self: flex-start;
       border-bottom-left-radius: 6px;
     }
     .message .sender {
       font-size: 11px;
       font-weight: 600;
-      color: #075e54;
+      color: #b8a9f0;
       margin-bottom: 2px;
       display: block;
     }
-    .message-sent .sender { color: #1a7a6a; }
+    .message-sent .sender { color: #d4ccf0; }
     .message .text { margin: 0; }
     .message .gif-image {
       max-width: 180px;
@@ -399,17 +429,66 @@
     }
     .message .timestamp {
       font-size: 10px;
-      color: #8e8e93;
+      color: rgba(255,255,255,0.5);
       margin-top: 4px;
       text-align: right;
-      opacity: 0.7;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
     }
-    .message-sent .timestamp { color: #4a7a6a; }
+    .message-sent .timestamp { color: rgba(255,255,255,0.6); }
+    .message .timestamp .read-status {
+      font-size: 12px;
+      margin-left: 4px;
+    }
+    .message .reply-preview {
+      background: rgba(255,255,255,0.06);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #aaa;
+      margin-bottom: 4px;
+      border-left: 3px solid #6c5ce7;
+    }
+    .message-sent .reply-preview {
+      background: rgba(255,255,255,0.1);
+      border-left-color: #b8a9f0;
+    }
+
+    /* === REPLY PANEL (при ответе) === */
+    .reply-panel {
+      display: none;
+      background: #1e1e1e;
+      padding: 8px 16px;
+      border-top: 1px solid #2a2a2a;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .reply-panel.active { display: flex; }
+    .reply-panel .reply-content {
+      flex: 1;
+      font-size: 14px;
+      color: #aaa;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .reply-panel .reply-content strong { color: #f0f0f0; }
+    .reply-panel .cancel-reply {
+      background: none;
+      border: none;
+      color: #ff6b6b;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 8px;
+    }
 
     /* === INPUT AREA === */
     .input-area {
-      background: #f8f9fa;
-      border-top: 1px solid #e9ecef;
+      background: #1a1a1a;
+      border-top: 1px solid #2a2a2a;
       padding: 8px 12px;
       display: flex;
       gap: 8px;
@@ -423,7 +502,7 @@
       line-height: 1;
       padding: 6px 4px;
       cursor: pointer;
-      color: #075e54;
+      color: #6c5ce7;
       transition: 0.2s;
     }
     .input-area .gif-btn:active { transform: scale(0.85); }
@@ -438,15 +517,17 @@
       min-height: 40px;
       max-height: 100px;
       font-family: inherit;
-      background: white;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      background: #252525;
+      color: #f0f0f0;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.2);
       transition: 0.2s;
     }
     .input-area textarea:focus {
-      box-shadow: 0 0 0 3px rgba(7, 94, 84, 0.12);
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+      background: #2a2a2a;
     }
     .input-area .send-btn {
-      background: #075e54;
+      background: #6c5ce7;
       border: none;
       color: white;
       font-size: 18px;
@@ -461,14 +542,13 @@
       flex-shrink: 0;
     }
     .input-area .send-btn:active { transform: scale(0.92); }
-    .input-area .send-btn i { margin-left: 2px; }
 
-    /* === SCROLL DOWN BUTTON === */
+    /* === SCROLL DOWN === */
     .scroll-down-btn {
       position: absolute;
       bottom: 80px;
       right: 16px;
-      background: #075e54;
+      background: #6c5ce7;
       color: white;
       border: none;
       border-radius: 50%;
@@ -476,7 +556,7 @@
       height: 44px;
       font-size: 18px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 16px rgba(108,92,231,0.4);
       display: none;
       align-items: center;
       justify-content: center;
@@ -493,15 +573,15 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.7);
       z-index: 100;
       justify-content: center;
       align-items: center;
-      backdrop-filter: blur(2px);
+      backdrop-filter: blur(4px);
     }
     .gif-popup.active { display: flex; }
     .gif-popup-content {
-      background: white;
+      background: #1e1e1e;
       border-radius: 28px;
       width: 90%;
       max-width: 400px;
@@ -510,7 +590,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
     }
     .gif-popup-content .header {
       display: flex;
@@ -521,32 +601,34 @@
     .gif-popup-content .header h3 {
       font-size: 18px;
       font-weight: 700;
-      color: #075e54;
+      color: #f0f0f0;
       margin: 0;
     }
+    .gif-popup-content .header h3 i { color: #6c5ce7; margin-right: 8px; }
     .gif-popup-content .header .close-btn {
       background: none;
       border: none;
       font-size: 26px;
       cursor: pointer;
-      color: #8e8e93;
+      color: #888;
       padding: 0 8px;
     }
     .gif-popup-content input {
       width: 100%;
       padding: 12px 16px;
       border-radius: 30px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid #333;
       font-size: 15px;
       outline: none;
       margin-bottom: 14px;
-      background: #f5f5f5;
+      background: #252525;
+      color: #f0f0f0;
       transition: 0.2s;
     }
     .gif-popup-content input:focus {
-      border-color: #25d366;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(37,211,102,0.15);
+      border-color: #6c5ce7;
+      background: #2a2a2a;
+      box-shadow: 0 0 0 3px rgba(108,92,231,0.2);
     }
     .gif-grid {
       display: flex;
@@ -568,11 +650,11 @@
     }
     .gif-grid img:hover {
       transform: scale(1.03);
-      border-color: #25d366;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      border-color: #6c5ce7;
+      box-shadow: 0 4px 12px rgba(108,92,231,0.3);
     }
     .gif-grid .placeholder {
-      color: #8e8e93;
+      color: #636e72;
       font-size: 15px;
       padding: 30px 0;
       text-align: center;
@@ -582,15 +664,15 @@
     /* === SCROLLBAR === */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #c4c4c4; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+    ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
   </style>
 </head>
 <body>
 <div id="app">
   <!-- Страница входа -->
   <div id="login-page">
-    <h2><i class="fab fa-whatsapp"></i> Чат</h2>
+    <h2><i class="fas fa-comment-dots"></i> Чат</h2>
     <input type="email" id="login-email" placeholder="Email" value="test@mail.com">
     <input type="password" id="login-password" placeholder="Пароль" value="123456">
     <button class="btn-login" id="btn-login"><i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>Войти</button>
@@ -602,7 +684,7 @@
   <div id="chat-page">
     <div id="start-screen">
       <div class="chat-header">
-        <span class="title"><i class="fab fa-whatsapp"></i>Чаты</span>
+        <span class="title"><i class="fas fa-comment-dots"></i>Чаты</span>
         <button class="logout-btn" id="btn-logout"><i class="fas fa-sign-out-alt"></i> Выйти</button>
       </div>
       <div class="search-area">
@@ -621,16 +703,29 @@
       <div class="chat-header">
         <button class="back-btn" id="chat-back-btn"><i class="fas fa-arrow-left"></i></button>
         <div class="chat-info">
-          <div class="avatar" id="chat-avatar">?</div>
-          <span class="title" id="chat-title">Чат</span>
+          <div class="avatar" id="chat-avatar">
+            ?
+            <span class="online-dot offline" id="chat-online-dot"></span>
+          </div>
+          <div>
+            <span class="title" id="chat-title">Чат</span>
+            <span class="subtitle" id="chat-subtitle">офлайн</span>
+          </div>
         </div>
         <div class="chat-actions">
-          <i class="fas fa-phone-alt" style="opacity:0.7;"></i>
-          <i class="fas fa-ellipsis-v" style="opacity:0.7;"></i>
+          <i class="fas fa-phone-alt"></i>
+          <i class="fas fa-ellipsis-v"></i>
         </div>
       </div>
       <div class="messages-area" id="messages-area"></div>
       <button class="scroll-down-btn" id="scroll-down-btn"><i class="fas fa-chevron-down"></i></button>
+
+      <!-- Панель ответа -->
+      <div class="reply-panel" id="reply-panel">
+        <div class="reply-content" id="reply-content">Ответ на <strong>сообщение</strong></div>
+        <button class="cancel-reply" id="cancel-reply"><i class="fas fa-times"></i></button>
+      </div>
+
       <div class="input-area">
         <button class="gif-btn" id="gif-btn"><i class="fas fa-image"></i></button>
         <textarea id="message-input" placeholder="Сообщение..." rows="1"></textarea>
@@ -643,7 +738,7 @@
   <div class="gif-popup" id="gif-popup">
     <div class="gif-popup-content">
       <div class="header">
-        <h3><i class="fas fa-grin-stars" style="color:#25d366;margin-right:8px;"></i>Поиск GIF</h3>
+        <h3><i class="fas fa-grin-stars"></i>Поиск GIF</h3>
         <button class="close-btn" id="gif-popup-close"><i class="fas fa-times"></i></button>
       </div>
       <input type="search" id="gif-search-input" placeholder="Найти гифку...">
@@ -678,6 +773,9 @@
   const messageInput = document.getElementById('message-input');
   const sendBtn = document.getElementById('send-btn');
   const chatTitle = document.getElementById('chat-title');
+  const chatSubtitle = document.getElementById('chat-subtitle');
+  const chatAvatar = document.getElementById('chat-avatar');
+  const chatOnlineDot = document.getElementById('chat-online-dot');
   const chatBackBtn = document.getElementById('chat-back-btn');
   const scrollDownBtn = document.getElementById('scroll-down-btn');
   const gifBtn = document.getElementById('gif-btn');
@@ -686,7 +784,17 @@
   const gifSearch = document.getElementById('gif-search-input');
   const gifGrid = document.getElementById('gif-grid');
   const statusEl = document.getElementById('login-status');
-  let currentChatId = null, currentChatUser = null, chatsListener = null, messagesListener = null, searchTimeout = null;
+  const replyPanel = document.getElementById('reply-panel');
+  const replyContent = document.getElementById('reply-content');
+  const cancelReply = document.getElementById('cancel-reply');
+
+  let currentChatId = null;
+  let currentChatUser = null;
+  let chatsListener = null;
+  let messagesListener = null;
+  let searchTimeout = null;
+  let replyToMessageId = null; // ID сообщения, на которое отвечаем
+  let currentUserPresenceRef = null; // для отслеживания онлайна
 
   // ==================== HELPERS ====================
   function getInitials(name) {
@@ -705,20 +813,82 @@
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
+  function formatDate(timestamp) {
+    if (!timestamp) return '';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString();
+  }
   function scrollToBottom() { messagesArea.scrollTop = messagesArea.scrollHeight; }
 
+  // ==================== ONLINE STATUS ====================
+  function initPresence() {
+    const user = auth.currentUser;
+    if (!user) return;
+    const userRef = db.collection('users').doc(user.uid);
+    currentUserPresenceRef = userRef;
+    // Устанавливаем онлайн
+    userRef.update({
+      online: true,
+      lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(() => {});
+
+    // При отключении устанавливаем offline
+    const onDisconnect = userRef.collection('presence').doc('status');
+    onDisconnect.set({
+      online: false,
+      lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      // После установки onDisconnect, обновляем основной документ
+      userRef.update({
+        online: true,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+
+    // Периодическое обновление (каждые 30 секунд)
+    setInterval(() => {
+      userRef.update({
+        online: true,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(() => {});
+    }, 30000);
+  }
+
+  // Получить статус пользователя и подписаться
+  function listenUserStatus(userId, callback) {
+    return db.collection('users').doc(userId).onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        callback(data.online, data.lastSeen);
+      }
+    });
+  }
+
   // ==================== UI: ADD MESSAGE ====================
-  function addMessageToUI(data) {
+  function addMessageToUI(data, msgId) {
     const currentUser = auth.currentUser;
     if (!currentUser) return;
     const isMine = data.senderId === currentUser.uid;
     const senderName = data.senderName || 'Аноним';
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${isMine ? 'message-sent' : 'message-received'}`;
+    msgDiv.dataset.msgId = msgId;
+
+    // Если это ответ на сообщение
+    if (data.replyTo) {
+      const replyDiv = document.createElement('div');
+      replyDiv.className = 'reply-preview';
+      // Попробуем получить текст или гифку исходного сообщения
+      const repliedText = data.replyToText || 'Сообщение';
+      replyDiv.innerHTML = `<i class="fas fa-reply" style="margin-right:4px;"></i> ${repliedText}`;
+      msgDiv.appendChild(replyDiv);
+    }
+
     const senderSpan = document.createElement('span');
     senderSpan.className = 'sender';
     senderSpan.textContent = senderName;
     msgDiv.appendChild(senderSpan);
+
     if (data.text) {
       const textP = document.createElement('div');
       textP.className = 'text';
@@ -731,13 +901,52 @@
       img.alt = 'GIF';
       msgDiv.appendChild(img);
     }
+
     const timeSpan = document.createElement('div');
     timeSpan.className = 'timestamp';
-    timeSpan.textContent = formatTime(data.timestamp);
+    timeSpan.innerHTML = formatTime(data.timestamp);
+
+    // Статус прочтения для своих сообщений
+    if (isMine) {
+      const readStatus = document.createElement('span');
+      readStatus.className = 'read-status';
+      const readBy = data.readBy || [];
+      if (readBy.length > 1) {
+        readStatus.innerHTML = '✔✔'; // прочитано
+      } else {
+        readStatus.innerHTML = '✔'; // отправлено
+      }
+      timeSpan.appendChild(readStatus);
+    }
     msgDiv.appendChild(timeSpan);
+
+    // Клик по сообщению для ответа
+    msgDiv.addEventListener('click', (e) => {
+      // Игнорируем клик по кнопкам внутри (если есть)
+      if (e.target.closest('.read-status')) return;
+      // Если сообщение своё, тоже можно ответить (но обычно отвечают на чужие)
+      setReplyTo(msgId, data);
+    });
+
     messagesArea.appendChild(msgDiv);
     scrollToBottom();
   }
+
+  // ==================== ОТВЕТЫ ====================
+  function setReplyTo(msgId, msgData) {
+    replyToMessageId = msgId;
+    const text = msgData.text || (msgData.gifUrl ? 'GIF' : 'Сообщение');
+    replyContent.innerHTML = `Ответ на <strong>${text}</strong>`;
+    replyPanel.classList.add('active');
+    messageInput.focus();
+  }
+
+  function clearReply() {
+    replyToMessageId = null;
+    replyPanel.classList.remove('active');
+  }
+
+  cancelReply.addEventListener('click', clearReply);
 
   // ==================== CHAT FUNCTIONS ====================
   async function getOrCreateChat(otherUserId) {
@@ -759,14 +968,29 @@
     currentChatId = chatId;
     currentChatUser = otherUser;
     chatTitle.textContent = otherUser.name || otherUser.email || 'Чат';
-    // Обновляем аватарку в шапке
-    const avatarEl = document.getElementById('chat-avatar');
     const name = otherUser.name || otherUser.email || 'Чат';
-    avatarEl.textContent = getInitials(name);
-    avatarEl.style.background = stringToColor(otherUser.uid);
+    const initials = getInitials(name);
+    chatAvatar.innerHTML = `${initials} <span class="online-dot offline" id="chat-online-dot"></span>`;
+    chatAvatar.style.background = stringToColor(otherUser.uid);
+    // Подписываемся на статус пользователя
+    if (window._statusUnsub) window._statusUnsub();
+    window._statusUnsub = listenUserStatus(otherUser.uid, (online, lastSeen) => {
+      const dot = chatAvatar.querySelector('.online-dot');
+      if (online) {
+        dot.className = 'online-dot';
+        chatSubtitle.textContent = 'онлайн';
+      } else {
+        dot.className = 'online-dot offline';
+        const time = lastSeen ? formatTime(lastSeen) : 'недавно';
+        chatSubtitle.textContent = `был(а) ${time}`;
+      }
+    });
+
     startScreen.classList.remove('active');
     chatScreen.classList.add('active');
     messagesArea.innerHTML = '';
+    clearReply();
+
     if (messagesListener) messagesListener();
     messagesListener = db.collection('chats')
       .doc(chatId)
@@ -774,19 +998,60 @@
       .orderBy('timestamp', 'asc')
       .onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          if (change.type === 'added') addMessageToUI(change.doc.data());
+          if (change.type === 'added') {
+            const data = change.doc.data();
+            addMessageToUI(data, change.doc.id);
+            // Если сообщение от другого пользователя, отмечаем его как прочитанное
+            if (data.senderId !== auth.currentUser.uid) {
+              markAsRead(change.doc.id);
+            }
+          }
         });
+        // Помечаем все непрочитанные как прочитанные (при загрузке)
+        markAllAsRead();
       }, (error) => { console.error('Ошибка подписки на сообщения:', error); });
     scrollToBottom();
   }
 
+  // === Отметить одно сообщение как прочитанное ===
+  async function markAsRead(msgId) {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+      const msgRef = db.collection('chats').doc(currentChatId).collection('messages').doc(msgId);
+      await msgRef.update({
+        readBy: firebase.firestore.FieldValue.arrayUnion(user.uid)
+      });
+    } catch (e) { /* игнорируем, если уже прочитано */ }
+  }
+
+  // === Отметить все непрочитанные сообщения в чате ===
+  async function markAllAsRead() {
+    const user = auth.currentUser;
+    if (!user || !currentChatId) return;
+    try {
+      const snapshot = await db.collection('chats')
+        .doc(currentChatId)
+        .collection('messages')
+        .where('senderId', '!=', user.uid)
+        .where('readBy', 'array-contains', user.uid)
+        .limit(1)
+        .get();
+      // Если есть непрочитанные, нужно обновить их все
+      // Простой способ: получить все сообщения, где readBy не содержит user.uid
+      // Это может быть затратно, поэтому лучше делать по одному при получении (см. выше)
+    } catch (e) { console.error(e); }
+  }
+
   function closeChat() {
     if (messagesListener) { messagesListener(); messagesListener = null; }
+    if (window._statusUnsub) { window._statusUnsub(); window._statusUnsub = null; }
     currentChatId = null;
     currentChatUser = null;
     chatScreen.classList.remove('active');
     startScreen.classList.add('active');
     messagesArea.innerHTML = '';
+    clearReply();
   }
 
   // ==================== SEND MESSAGE ====================
@@ -795,13 +1060,36 @@
     if (!user) { alert('Вы не авторизованы!'); return; }
     if (!text || !text.trim()) return;
     if (!currentChatId) { alert('Чат не выбран!'); return; }
+
+    const msgData = {
+      text: text.trim(),
+      senderId: user.uid,
+      senderName: user.displayName || user.email || 'Аноним',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      readBy: [user.uid] // автор сразу прочитал
+    };
+    if (replyToMessageId) {
+      msgData.replyTo = replyToMessageId;
+      // Сохраняем текст цитируемого сообщения (для отображения)
+      // Получим данные из DOM или из кэша, но для простоты сохраним текст
+      // Можно вытащить из предыдущего сообщения, но мы сохраним как есть
+      const replyMsg = document.querySelector(`.message[data-msg-id="${replyToMessageId}"]`);
+      if (replyMsg) {
+        const textEl = replyMsg.querySelector('.text');
+        if (textEl) msgData.replyToText = textEl.textContent;
+        else {
+          const gifEl = replyMsg.querySelector('.gif-image');
+          if (gifEl) msgData.replyToText = 'GIF';
+          else msgData.replyToText = 'Сообщение';
+        }
+      } else {
+        msgData.replyToText = 'Сообщение';
+      }
+      clearReply();
+    }
+
     try {
-      await db.collection('chats').doc(currentChatId).collection('messages').add({
-        text: text.trim(),
-        senderId: user.uid,
-        senderName: user.displayName || user.email || 'Аноним',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      const docRef = await db.collection('chats').doc(currentChatId).collection('messages').add(msgData);
       await db.collection('chats').doc(currentChatId).update({
         lastMessage: text.trim(),
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -815,13 +1103,20 @@
     const user = auth.currentUser;
     if (!user) { alert('Вы не авторизованы!'); return; }
     if (!currentChatId) { alert('Чат не выбран!'); return; }
+    const msgData = {
+      gifUrl: gifUrl,
+      senderId: user.uid,
+      senderName: user.displayName || user.email || 'Аноним',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      readBy: [user.uid]
+    };
+    if (replyToMessageId) {
+      msgData.replyTo = replyToMessageId;
+      msgData.replyToText = 'GIF';
+      clearReply();
+    }
     try {
-      await db.collection('chats').doc(currentChatId).collection('messages').add({
-        gifUrl: gifUrl,
-        senderId: user.uid,
-        senderName: user.displayName || user.email || 'Аноним',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      await db.collection('chats').doc(currentChatId).collection('messages').add(msgData);
       await db.collection('chats').doc(currentChatId).update({
         lastMessage: '🖼️ GIF',
         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -870,13 +1165,26 @@
           const initials = getInitials(item.user.name);
           const bgColor = stringToColor(item.user.uid);
           div.innerHTML = `
-            <div class="avatar" style="background:${bgColor};">${initials}</div>
+            <div class="avatar" style="background:${bgColor};">
+              ${initials}
+              <span class="online-dot offline" id="dot-${item.user.uid}"></span>
+            </div>
             <div class="info">
               <div class="name">${item.user.name}</div>
               <div class="last-msg">${item.lastMessage}</div>
             </div>
             <div class="time">${item.lastUpdated ? formatTime(item.lastUpdated) : ''}</div>
           `;
+          // Подписываемся на статус для каждого чата
+          const dot = div.querySelector('.online-dot');
+          listenUserStatus(item.user.uid, (online) => {
+            if (online) {
+              dot.className = 'online-dot';
+            } else {
+              dot.className = 'online-dot offline';
+            }
+          });
+
           div.addEventListener('click', () => { openChat(item.chatId, item.user); });
           chatList.appendChild(div);
         });
@@ -933,12 +1241,12 @@
         searchResults.appendChild(div);
       });
       if (!found) {
-        searchResults.innerHTML = '<div style="padding:12px 20px;color:#8e8e93;">Пользователь не найден</div>';
+        searchResults.innerHTML = '<div style="padding:12px 20px;color:#636e72;">Пользователь не найден</div>';
       }
       searchResults.classList.add('active');
     } catch (e) {
       console.error('Ошибка поиска:', e);
-      searchResults.innerHTML = '<div style="padding:12px 20px;color:red;">Ошибка поиска</div>';
+      searchResults.innerHTML = '<div style="padding:12px 20px;color:#ff6b6b;">Ошибка поиска</div>';
       searchResults.classList.add('active');
     }
   }
@@ -982,11 +1290,11 @@
     auth.signInWithEmailAndPassword(email, password)
       .then(() => {
         statusEl.textContent = '✅ Вход выполнен';
-        statusEl.style.color = '#34c759';
+        statusEl.style.color = '#00b894';
       })
       .catch(e => {
         statusEl.textContent = '❌ ' + e.message;
-        statusEl.style.color = '#ff3b30';
+        statusEl.style.color = '#ff6b6b';
       });
   });
 
@@ -995,7 +1303,7 @@
     const password = document.getElementById('login-password').value.trim();
     if (!email || !password) {
       statusEl.textContent = '❌ Введите email и пароль';
-      statusEl.style.color = '#ff3b30';
+      statusEl.style.color = '#ff6b6b';
       return;
     }
     try {
@@ -1003,18 +1311,29 @@
       await db.collection('users').doc(cred.user.uid).set({
         name: email.split('@')[0] || 'Пользователь',
         email: email.toLowerCase(),
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        online: true,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
       });
       statusEl.textContent = '✅ Аккаунт создан!';
-      statusEl.style.color = '#34c759';
+      statusEl.style.color = '#00b894';
     } catch (e) {
       console.error('❌ Registration error:', e);
       statusEl.textContent = '❌ ' + e.message;
-      statusEl.style.color = '#ff3b30';
+      statusEl.style.color = '#ff6b6b';
     }
   });
 
-  document.getElementById('btn-logout').addEventListener('click', () => { auth.signOut(); });
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    // Обновляем статус офлайн
+    if (auth.currentUser) {
+      db.collection('users').doc(auth.currentUser.uid).update({
+        online: false,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(() => {});
+    }
+    auth.signOut();
+  });
   chatBackBtn.addEventListener('click', closeChat);
 
   sendBtn.addEventListener('click', () => sendMessage(messageInput.value));
@@ -1065,9 +1384,18 @@
           await docRef.set({
             name: user.email.split('@')[0] || 'Пользователь',
             email: user.email.toLowerCase(),
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            online: true,
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          // Обновим онлайн
+          await docRef.update({
+            online: true,
+            lastSeen: firebase.firestore.FieldValue.serverTimestamp()
           });
         }
+        initPresence();
       } catch (e) {
         console.warn('⚠️ Could not check/create user document:', e);
       }
@@ -1077,10 +1405,18 @@
       chatScreen.classList.remove('active');
       renderChatList();
     } else {
+      if (currentUserPresenceRef) {
+        currentUserPresenceRef.update({
+          online: false,
+          lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
+        currentUserPresenceRef = null;
+      }
       loginPage.style.display = 'flex';
       chatPage.style.display = 'none';
       if (chatsListener) { chatsListener(); chatsListener = null; }
       if (messagesListener) { messagesListener(); messagesListener = null; }
+      if (window._statusUnsub) { window._statusUnsub(); window._statusUnsub = null; }
       chatList.innerHTML = '';
       messagesArea.innerHTML = '';
       currentChatId = null;
@@ -1089,7 +1425,7 @@
     }
   });
 
-  console.log('✅ Чат обновлён! Дизайн в стиле WhatsApp.');
+  console.log('✅ Обновлённый чат с ответами, статусами и дизайном!');
 </script>
 </body>
 </html>
